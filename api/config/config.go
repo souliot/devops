@@ -45,9 +45,9 @@ type Option func(*ServerCfg)
 var DefaultServerCfg = &ServerCfg{
 	HttpPort:   8080,
 	DBHost:     []string{"localhost:27017"},
-	DBName:     "default",
-	DBUser:     "admin",
-	DBPassword: "123456",
+	DBName:     "",
+	DBUser:     "",
+	DBPassword: "",
 }
 
 func (c *ServerCfg) Apply(opts []Option) {

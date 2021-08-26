@@ -5,6 +5,7 @@ import (
 	"devops/api/models"
 	"devops/api/routes"
 	"devops/pkg/db"
+	"devops/pkg/trans"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -32,12 +33,14 @@ func (s *Server) Start() {
 		DBName:   s.cfg.DBName,
 	}
 	db.InitMongo(ms)
+	trans.InitTrans("zh")
 	models.DefaultMetrics.Init()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	routes.InitRouter(r)
 	go r.Run(fmt.Sprintf(":%d", s.cfg.HttpPort))
 	logs.Info("API Server 启动成功，端口：%d", s.cfg.HttpPort)
+	models.InitModels()
 }
 
 func (s *Server) SaveConfig() {

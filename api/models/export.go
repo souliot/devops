@@ -2,14 +2,24 @@ package models
 
 import (
 	"devops/pkg/resp"
+	"time"
 )
 
 type Export struct {
-	Id         string   `bson:"_id"`
-	Type       string   `bson:"Type"`
-	Address    string   `bson:"Address"`
-	CreateTime int64    `bson:"CreateTime"`
-	Targets    []string `orm:"-" json:"targets"`
+	Id         string   `bson:"_id" json:"id,omitempty"`
+	Type       string   `bson:"Type" binding:"required" json:"type,omitempty"`
+	Address    string   `bson:"Address" binding:"required" json:"address,omitempty"`
+	CreateTime int64    `bson:"CreateTime" json:"createTime,omitempty"`
+	Targets    []string `orm:"-" bson:"-" json:"targets,omitempty"`
+}
+
+func (m *Export) Add() (errC *resp.Response, err error) {
+	m.CreateTime = time.Now().Unix()
+	o.ReadOrCreate(m, "Type", "Address")
+	if err != nil {
+		errC = resp.ErrDbInsert
+	}
+	return
 }
 
 func (m *Export) Node() (exs []*Export, errC *resp.Response, err error) {

@@ -28,9 +28,9 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/export/node": {
-            "get": {
-                "description": "获取用户 Prometheus http_sd_config 的接口",
+        "/export": {
+            "post": {
+                "description": "添加 Prometheus http_sd_config 的接口",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,9 +38,55 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "监控暴露"
+                    "监控"
                 ],
-                "summary": "Export",
+                "summary": "添加监控节点",
+                "parameters": [
+                    {
+                        "description": "监控节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Export"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Export"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/export/node": {
+            "get": {
+                "description": "获取 Prometheus http_sd_config 的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "监控"
+                ],
+                "summary": "获取监控节点",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -70,7 +116,7 @@ var doc = `{
                     "application/json"
                 ],
                 "produces": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "tags": [
                     "监控暴露"
@@ -90,12 +136,28 @@ var doc = `{
     "definitions": {
         "models.Export": {
             "type": "object",
+            "required": [
+                "address",
+                "type"
+            ],
             "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
                 "targets": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -112,7 +174,7 @@ var doc = `{
                     "type": "string"
                 },
                 "more_info": {
-                    "type": "string"
+                    "type": "object"
                 },
                 "status": {
                     "type": "integer"

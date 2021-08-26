@@ -2,10 +2,21 @@ basePath: /v1
 definitions:
   models.Export:
     properties:
+      address:
+        type: string
+      createTime:
+        type: integer
+      id:
+        type: string
       targets:
         items:
           type: string
         type: array
+      type:
+        type: string
+    required:
+    - address
+    - type
     type: object
   resp.Response:
     properties:
@@ -16,7 +27,7 @@ definitions:
       message:
         type: string
       more_info:
-        type: string
+        type: object
       status:
         type: integer
       type:
@@ -32,11 +43,18 @@ info:
   title: DevOps 开发文档
   version: v1.0.0
 paths:
-  /export/node:
-    get:
+  /export:
+    post:
       consumes:
       - application/json
-      description: 获取用户 Prometheus http_sd_config 的接口
+      description: 添加 Prometheus http_sd_config 的接口
+      parameters:
+      - description: 监控节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Export'
       produces:
       - application/json
       responses:
@@ -49,16 +67,36 @@ paths:
                 data:
                   $ref: '#/definitions/models.Export'
               type: object
-      summary: Export
+      summary: 添加监控节点
       tags:
-      - 监控暴露
+      - 监控
+  /export/node:
+    get:
+      consumes:
+      - application/json
+      description: 获取 Prometheus http_sd_config 的接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Export'
+              type: object
+      summary: 获取监控节点
+      tags:
+      - 监控
   /metrics:
     get:
       consumes:
       - application/json
       description: 获取用户 Prometheus http_sd_config 的接口
       produces:
-      - application/json
+      - text/plain
       responses:
         "200":
           description: OK

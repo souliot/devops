@@ -29,11 +29,15 @@ func InitMongo(s *MongoSetting) {
 	}
 	mongo_address := "mongodb://" + mu + strings.Join(s.Hosts, ",") + "/" + s.DBName + "?authSource=admin"
 
-	orm.RegisterDriver("mongo", orm.DRMongo)
-	err := orm.RegisterDataBase(mongodb, "mongo", mongo_address, true)
+	err := orm.RegisterDriver("mongo", orm.DRMongo)
 	if err != nil {
-		logs.Error("初始化mongodb错误：", err)
+		logs.Error("初始化mongodb driver错误：", err)
 		return
 	}
-	logs.Info("Mongo 数据库初始化成功：", mongo_address)
+	err = orm.RegisterDataBase(mongodb, "mongo", mongo_address, true)
+	if err != nil {
+		logs.Error("初始化mongodb错误:", mongodb, mongo_address, err)
+		return
+	}
+	logs.Info("初始化 Mongo 数据库配置成功：", mongo_address)
 }

@@ -18,6 +18,7 @@ func InitRouter(r *gin.Engine) {
 		// export
 		export := v1.Group("/export")
 		{
+			export.POST("/", (&controllers.Export{}).Add)
 			export.GET("/node", (&controllers.Export{}).Node)
 		}
 	}
