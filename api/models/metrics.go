@@ -19,7 +19,7 @@ type Metrics struct{}
 func (m *Metrics) Init() {
 	r := prometheus.NewRegistry()
 	system.RegisterSystemCollector(r)
-	service.RegisterServiceCollector(r, &service.RegisterOptions{"common"})
+	service.RegisterServiceCollector(r, &service.RegisterOptions{"loghub"})
 
 	Handler = promhttp.HandlerFor(
 		prometheus.Gatherers{r},

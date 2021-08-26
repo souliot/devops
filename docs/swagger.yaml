@@ -1,0 +1,70 @@
+basePath: /v1
+definitions:
+  models.Export:
+    properties:
+      targets:
+        items:
+          type: string
+        type: array
+    type: object
+  resp.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+      more_info:
+        type: string
+      status:
+        type: integer
+      type:
+        type: string
+    type: object
+info:
+  contact:
+    email: leizhou.lin@watrix.ai
+    name: API Support
+    url: github.com/souliot
+  description: Golang api of demo
+  termsOfService: github.com/souliot
+  title: DevOps 开发文档
+  version: v1.0.0
+paths:
+  /export/node:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户 Prometheus http_sd_config 的接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Export'
+              type: object
+      summary: Export
+      tags:
+      - 监控暴露
+  /metrics:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户 Prometheus http_sd_config 的接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Export
+      tags:
+      - 监控暴露
+swagger: "2.0"
