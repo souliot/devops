@@ -29,6 +29,68 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/export": {
+            "get": {
+                "description": "获取 Prometheus http_sd_config 的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "监控"
+                ],
+                "summary": "获取监控节点列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "node address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Export"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "添加 Prometheus http_sd_config 的接口",
                 "consumes": [
@@ -74,7 +136,7 @@ var doc = `{
                 }
             }
         },
-        "/export/node": {
+        "/export/{type}": {
             "get": {
                 "description": "获取 Prometheus http_sd_config 的接口",
                 "consumes": [
@@ -87,6 +149,15 @@ var doc = `{
                     "监控"
                 ],
                 "summary": "获取监控节点",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -142,21 +213,26 @@ var doc = `{
             ],
             "properties": {
                 "address": {
+                    "description": "节点地址",
                     "type": "string"
                 },
                 "createTime": {
+                    "description": "创建时间",
                     "type": "integer"
                 },
                 "id": {
+                    "description": "Id",
                     "type": "string"
                 },
                 "targets": {
+                    "description": "节点地址列表",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "type": {
+                    "description": "节点类型",
                     "type": "string"
                 }
             }

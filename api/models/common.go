@@ -8,6 +8,16 @@ var (
 	o orm.Ormer
 )
 
+type PageQuery struct {
+	Page     int `json:"-"`
+	PageSize int `json:"-"`
+}
+
+type List struct {
+	Total int64       `json:"total"`
+	Lists interface{} `json:"lists"`
+}
+
 func InitModels() {
 	orm.RegisterModel(new(Export))
 	o = orm.NewOrm()

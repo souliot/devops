@@ -7,6 +7,7 @@ import (
 )
 
 func InitRouter(r *gin.Engine) {
+	r.NoRoute((&controllers.Base{}).HandlerNoRouter)
 	// metrics touter
 	root := r.Group("/")
 	{
@@ -19,7 +20,8 @@ func InitRouter(r *gin.Engine) {
 		export := v1.Group("/export")
 		{
 			export.POST("/", (&controllers.Export{}).Add)
-			export.GET("/node", (&controllers.Export{}).Node)
+			export.GET("/", (&controllers.Export{}).All)
+			export.GET("/:type", (&controllers.Export{}).Node)
 		}
 	}
 }

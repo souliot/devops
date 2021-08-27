@@ -3,16 +3,21 @@ definitions:
   models.Export:
     properties:
       address:
+        description: 节点地址
         type: string
       createTime:
+        description: 创建时间
         type: integer
       id:
+        description: Id
         type: string
       targets:
+        description: 节点地址列表
         items:
           type: string
         type: array
       type:
+        description: 节点类型
         type: string
     required:
     - address
@@ -44,6 +49,44 @@ info:
   version: v1.0.0
 paths:
   /export:
+    get:
+      consumes:
+      - application/json
+      description: 获取 Prometheus http_sd_config 的接口
+      parameters:
+      - description: node type
+        in: query
+        name: type
+        type: string
+      - description: node address
+        in: query
+        name: address
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Export'
+                  type: array
+              type: object
+      summary: 获取监控节点列表
+      tags:
+      - 监控
     post:
       consumes:
       - application/json
@@ -70,11 +113,17 @@ paths:
       summary: 添加监控节点
       tags:
       - 监控
-  /export/node:
+  /export/{type}:
     get:
       consumes:
       - application/json
       description: 获取 Prometheus http_sd_config 的接口
+      parameters:
+      - description: node type
+        in: path
+        name: type
+        required: true
+        type: string
       produces:
       - application/json
       responses:

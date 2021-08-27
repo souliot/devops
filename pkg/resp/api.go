@@ -1,12 +1,12 @@
 package resp
 
 type Response struct {
-	Status   int         `json:"status,omitempty"`
-	Code     int         `json:"code,omitempty"`
-	Type     string      `json:"type,omitempty"`
-	Message  string      `json:"message,omitempty"`
-	MoreInfo interface{} `json:"more_info,omitempty"`
-	Data     interface{} `json:"data,omitempty"`
+	Status   int         `json:"status,omitempty"`    // 状态码 200:成功   其他失败
+	Code     int         `json:"code,omitempty"`      // 错误码 状态码不为200时返回
+	Type     string      `json:"type,omitempty"`      // 错误类型 状态码不为200时返回
+	Message  string      `json:"message,omitempty"`   // 错误信息 状态码不为200时返回
+	MoreInfo interface{} `json:"more_info,omitempty"` // 错误扩展信息 状态码不为200时返回
+	Data     interface{} `json:"data,omitempty"`      // 返回数据
 }
 
 // define Response status

@@ -12,14 +12,45 @@ type Export struct {
 }
 
 // @Tags 监控
+// @Summary  获取监控节点列表
+// @Description 获取 Prometheus http_sd_config 的接口
+// @Accept  json
+// @Produce json
+// @Param type 	   query string false "node type"
+// @Param address  query string false "node address"
+// @Param page 		 query string false "page"
+// @Param pageSize query string false "pageSize"
+// @Success 200 {object}	resp.Response{data=[]models.Export}
+// @Router /export [get]
+func (c *Export) All(ctx *gin.Context) {
+	m := &models.Export{PageQuery: &models.PageQuery{}}
+	m.Type = ctx.Query("type")
+	m.Address = ctx.Query("address")
+	m.Page = c.DefaultInt(ctx, "page", 1)
+	m.PageSize = c.DefaultInt(ctx, "pageSize", 0)
+
+	exs, errC, err := m.All()
+	if err != nil {
+		ctx.JSON(200, errC)
+		return
+	}
+	ctx.JSON(200, resp.NewSuccess(exs))
+}
+
+// @Tags 监控
 // @Summary  获取监控节点
 // @Description 获取 Prometheus http_sd_config 的接口
 // @Accept  json
 // @Produce json
+// @Param type path string true "node type"
 // @Success 200 {object}	resp.Response{data=models.Export}
-// @Router /export/node [get]
+// @Router /export/{type} [get]
 func (c *Export) Node(ctx *gin.Context) {
 	m := new(models.Export)
+	m.Type = ctx.Param("type")
+	if !c.CheckParams(ctx, m.Type) {
+		return
+	}
 	ex, errC, err := m.Node()
 	if err != nil {
 		ctx.JSON(200, errC)
