@@ -13,6 +13,244 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/env": {
+            "get": {
+                "description": "获取环境列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "环境"
+                ],
+                "summary": "获取环境列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "node address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Environment"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "修改环境的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "环境"
+                ],
+                "summary": "修改环境",
+                "parameters": [
+                    {
+                        "description": "环境节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Environment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Environment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "添加环境的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "环境"
+                ],
+                "summary": "添加环境",
+                "parameters": [
+                    {
+                        "description": "环境节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Environment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Environment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/env/{id}": {
+            "get": {
+                "description": "获取环境信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "环境"
+                ],
+                "summary": "获取环境信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Environment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除环境的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "环境"
+                ],
+                "summary": "删除环境",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Environment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/export": {
             "get": {
                 "description": "获取 Prometheus http_sd_config 的接口",
@@ -76,6 +314,50 @@
                     }
                 }
             },
+            "put": {
+                "description": "修改 Prometheus http_sd_config 的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "监控"
+                ],
+                "summary": "修改监控节点",
+                "parameters": [
+                    {
+                        "description": "监控节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Export"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Export"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "添加 Prometheus http_sd_config 的接口",
                 "consumes": [
@@ -121,7 +403,7 @@
                 }
             }
         },
-        "/export/{type}": {
+        "/export/type/{type}": {
             "get": {
                 "description": "获取 Prometheus http_sd_config 的接口",
                 "consumes": [
@@ -165,24 +447,87 @@
                 }
             }
         },
-        "/metrics": {
+        "/export/{id}": {
             "get": {
-                "description": "获取用户 Prometheus http_sd_config 的接口",
+                "description": "获取 Prometheus http_sd_config 的接口",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "监控暴露"
+                    "监控"
                 ],
-                "summary": "Export",
+                "summary": "获取监控节点信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Export"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除 Prometheus http_sd_config 的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "监控"
+                ],
+                "summary": "删除监控节点",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Export"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -190,6 +535,38 @@
         }
     },
     "definitions": {
+        "models.Environment": {
+            "type": "object",
+            "required": [
+                "etcdEndpoints",
+                "name"
+            ],
+            "properties": {
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "integer"
+                },
+                "desc": {
+                    "description": "环境描述",
+                    "type": "string"
+                },
+                "etcdEndpoints": {
+                    "description": "ETCD地址",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "description": "Id",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "环境名称",
+                    "type": "string"
+                }
+            }
+        },
         "models.Export": {
             "type": "object",
             "required": [
@@ -226,21 +603,27 @@
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "错误码 状态码不为200时返回",
                     "type": "integer"
                 },
                 "data": {
+                    "description": "返回数据",
                     "type": "object"
                 },
                 "message": {
+                    "description": "错误信息 状态码不为200时返回",
                     "type": "string"
                 },
                 "more_info": {
+                    "description": "错误扩展信息 状态码不为200时返回",
                     "type": "object"
                 },
                 "status": {
+                    "description": "状态码 200:成功   其他失败",
                     "type": "integer"
                 },
                 "type": {
+                    "description": "错误类型 状态码不为200时返回",
                     "type": "string"
                 }
             }

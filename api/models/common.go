@@ -20,5 +20,6 @@ type List struct {
 
 func InitModels() {
 	orm.RegisterModel(new(Export))
+	orm.RegisterModel(new(Environment))
 	o = orm.NewOrm()
 }

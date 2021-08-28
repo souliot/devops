@@ -19,12 +19,13 @@ func (m *Export) Add() (errC *resp.Response, err error) {
 	o.ReadOrCreate(m, "Type", "Address")
 	if err != nil {
 		errC = resp.ErrDbInsert
+		errC.MoreInfo = err.Error()
 	}
 	return
 }
 
-func (m *Export) All() (exs []*Export, errC *resp.Response, err error) {
-	exs = make([]*Export, 0)
+func (m *Export) All() (res []*Export, errC *resp.Response, err error) {
+	res = make([]*Export, 0)
 	qs := o.QueryTable(&Export{})
 	if m.Type != "" {
 		qs = qs.Filter("Type", m.Type)
@@ -33,7 +34,37 @@ func (m *Export) All() (exs []*Export, errC *resp.Response, err error) {
 		qs = qs.Filter("Address__regex", m.Address)
 	}
 
-	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("-CreateTime").All(&exs)
+	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("-CreateTime").All(&res)
+	if err != nil {
+		errC = resp.ErrDbRead
+		errC.MoreInfo = err.Error()
+		return
+	}
+	return
+}
+
+func (m *Export) One() (errC *resp.Response, err error) {
+	err = o.Read(m)
+	if err != nil {
+		errC = resp.ErrDbRead
+		errC.MoreInfo = err.Error()
+		return
+	}
+	return
+}
+
+func (m *Export) Delete() (errC *resp.Response, err error) {
+	_, err = o.Delete(m)
+	if err != nil {
+		errC = resp.ErrDbRead
+		errC.MoreInfo = err.Error()
+		return
+	}
+	return
+}
+
+func (m *Export) Update() (errC *resp.Response, err error) {
+	_, err = o.Update(m)
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()

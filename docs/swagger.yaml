@@ -1,5 +1,28 @@
 basePath: /v1
 definitions:
+  models.Environment:
+    properties:
+      createTime:
+        description: 创建时间
+        type: integer
+      desc:
+        description: 环境描述
+        type: string
+      etcdEndpoints:
+        description: ETCD地址
+        items:
+          type: string
+        type: array
+      id:
+        description: Id
+        type: string
+      name:
+        description: 环境名称
+        type: string
+    required:
+    - etcdEndpoints
+    - name
+    type: object
   models.Export:
     properties:
       address:
@@ -26,16 +49,22 @@ definitions:
   resp.Response:
     properties:
       code:
+        description: 错误码 状态码不为200时返回
         type: integer
       data:
+        description: 返回数据
         type: object
       message:
+        description: 错误信息 状态码不为200时返回
         type: string
       more_info:
+        description: 错误扩展信息 状态码不为200时返回
         type: object
       status:
+        description: 状态码 200:成功   其他失败
         type: integer
       type:
+        description: 错误类型 状态码不为200时返回
         type: string
     type: object
 info:
@@ -48,6 +77,148 @@ info:
   title: DevOps 开发文档
   version: v1.0.0
 paths:
+  /env:
+    get:
+      consumes:
+      - application/json
+      description: 获取环境列表
+      parameters:
+      - description: node type
+        in: query
+        name: type
+        type: string
+      - description: node address
+        in: query
+        name: address
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Environment'
+                  type: array
+              type: object
+      summary: 获取环境列表
+      tags:
+      - 环境
+    post:
+      consumes:
+      - application/json
+      description: 添加环境的接口
+      parameters:
+      - description: 环境节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Environment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Environment'
+              type: object
+      summary: 添加环境
+      tags:
+      - 环境
+    put:
+      consumes:
+      - application/json
+      description: 修改环境的接口
+      parameters:
+      - description: 环境节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Environment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Environment'
+              type: object
+      summary: 修改环境
+      tags:
+      - 环境
+  /env/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除环境的接口
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Environment'
+              type: object
+      summary: 删除环境
+      tags:
+      - 环境
+    get:
+      consumes:
+      - application/json
+      description: 获取环境信息
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Environment'
+              type: object
+      summary: 获取环境信息
+      tags:
+      - 环境
   /export:
     get:
       consumes:
@@ -113,7 +284,84 @@ paths:
       summary: 添加监控节点
       tags:
       - 监控
-  /export/{type}:
+    put:
+      consumes:
+      - application/json
+      description: 修改 Prometheus http_sd_config 的接口
+      parameters:
+      - description: 监控节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Export'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Export'
+              type: object
+      summary: 修改监控节点
+      tags:
+      - 监控
+  /export/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除 Prometheus http_sd_config 的接口
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Export'
+              type: object
+      summary: 删除监控节点
+      tags:
+      - 监控
+    get:
+      consumes:
+      - application/json
+      description: 获取 Prometheus http_sd_config 的接口
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Export'
+              type: object
+      summary: 获取监控节点信息
+      tags:
+      - 监控
+  /export/type/{type}:
     get:
       consumes:
       - application/json
@@ -139,19 +387,4 @@ paths:
       summary: 获取监控节点
       tags:
       - 监控
-  /metrics:
-    get:
-      consumes:
-      - application/json
-      description: 获取用户 Prometheus http_sd_config 的接口
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Export
-      tags:
-      - 监控暴露
 swagger: "2.0"

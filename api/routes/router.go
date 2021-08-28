@@ -19,9 +19,22 @@ func InitRouter(r *gin.Engine) {
 		// export
 		export := v1.Group("/export")
 		{
-			export.POST("/", (&controllers.Export{}).Add)
 			export.GET("/", (&controllers.Export{}).All)
-			export.GET("/:type", (&controllers.Export{}).Node)
+			export.GET("/:id", (&controllers.Export{}).One)
+			export.POST("/", (&controllers.Export{}).Add)
+			export.PUT("/", (&controllers.Export{}).Update)
+			export.DELETE("/:id", (&controllers.Export{}).Delete)
+			export.GET("/type/:type", (&controllers.Export{}).Node)
+		}
+
+		// export
+		env := v1.Group("/env")
+		{
+			env.GET("/", (&controllers.Environment{}).All)
+			env.GET("/:id", (&controllers.Environment{}).One)
+			env.POST("/", (&controllers.Environment{}).Add)
+			env.PUT("/", (&controllers.Environment{}).Update)
+			env.DELETE("/:id", (&controllers.Environment{}).Delete)
 		}
 	}
 }
