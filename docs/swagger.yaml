@@ -1,5 +1,28 @@
 basePath: /v1
 definitions:
+  controllers.ServiceMeta:
+    properties:
+      address:
+        type: string
+      ext:
+        type: object
+      id:
+        type: string
+      metricsAddress:
+        type: string
+      metricsType:
+        type: string
+      outAddress:
+        type: string
+      path:
+        type: string
+      status:
+        type: boolean
+      typ:
+        type: string
+      version:
+        type: string
+    type: object
   models.Environment:
     properties:
       createTime:
@@ -31,6 +54,9 @@ definitions:
       createTime:
         description: 创建时间
         type: integer
+      env:
+        description: 环境名称
+        type: string
       id:
         description: Id
         type: string
@@ -45,6 +71,40 @@ definitions:
     required:
     - address
     - type
+    type: object
+  models.PromJob:
+    properties:
+      configsType:
+        description: 配置类型：static || http
+        type: string
+      createTime:
+        description: 创建时间
+        type: integer
+      id:
+        description: Id
+        type: string
+      jobName:
+        description: 采集任务名称
+        type: string
+      metricsPath:
+        description: Metrics Path
+        type: string
+      scheme:
+        description: 协议 Scheme
+        type: string
+      targets:
+        description: static 采集目标
+        items:
+          type: string
+        type: array
+      url:
+        description: http 请求地址
+        type: string
+    required:
+    - configsType
+    - jobName
+    - metricsPath
+    - scheme
     type: object
   resp.Response:
     properties:
@@ -103,7 +163,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 []Environment
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -131,7 +191,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Environment
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -157,7 +217,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Environment
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -183,7 +243,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Environment
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -208,7 +268,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Environment
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -245,7 +305,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 []Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -273,7 +333,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -299,7 +359,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -325,7 +385,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -350,7 +410,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -372,11 +432,15 @@ paths:
         name: type
         required: true
         type: string
+      - description: node env
+        in: query
+        name: env
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: 返回数据 Export
           schema:
             allOf:
             - $ref: '#/definitions/resp.Response'
@@ -386,5 +450,261 @@ paths:
               type: object
       summary: 获取监控节点
       tags:
-      - 监控
+      - Prom
+  /prom/conf:
+    get:
+      consumes:
+      - application/json
+      description: 生成Prom配置文件
+      parameters:
+      - description: 生成配置文件路径
+        in: query
+        name: path
+        type: string
+      - description: 抓取时间间隔
+        in: query
+        name: scrapeInterval
+        type: string
+      - description: 报警检测时间间隔
+        in: query
+        name: evaluationInterval
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据
+          schema:
+            $ref: '#/definitions/resp.Response'
+      summary: 生成Prom配置文件
+      tags:
+      - Prom
+  /prom/reload:
+    post:
+      consumes:
+      - application/json
+      description: 重载Prom配置文件（热更新）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据
+          schema:
+            $ref: '#/definitions/resp.Response'
+      summary: 重载Prom配置文件
+      tags:
+      - Prom
+  /promjob:
+    get:
+      consumes:
+      - application/json
+      description: 获取任务列表
+      parameters:
+      - description: node address
+        in: query
+        name: jobName
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 []PromJob
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.PromJob'
+                  type: array
+              type: object
+      summary: 获取任务列表
+      tags:
+      - 任务
+    post:
+      consumes:
+      - application/json
+      description: 添加任务的接口
+      parameters:
+      - description: 任务节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.PromJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 PromJob
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PromJob'
+              type: object
+      summary: 添加任务
+      tags:
+      - 任务
+    put:
+      consumes:
+      - application/json
+      description: 修改任务的接口
+      parameters:
+      - description: 任务节点
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.PromJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 PromJob
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PromJob'
+              type: object
+      summary: 修改任务
+      tags:
+      - 任务
+  /promjob/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除任务的接口
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 PromJob
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PromJob'
+              type: object
+      summary: 删除任务
+      tags:
+      - 任务
+    get:
+      consumes:
+      - application/json
+      description: 获取任务信息
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 PromJob
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.PromJob'
+              type: object
+      summary: 获取任务信息
+      tags:
+      - 任务
+  /service/{env}/{path}/{type}/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除离线服务节点
+      parameters:
+      - description: service env
+        in: path
+        name: env
+        required: true
+        type: string
+      - description: service path
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: service type
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: service id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resp.Response'
+      summary: 删除离线服务节点
+      tags:
+      - 服务
+  /service/all:
+    get:
+      consumes:
+      - application/json
+      description: 获取服务列表
+      parameters:
+      - description: service env
+        in: query
+        name: env
+        type: string
+      - description: service path
+        in: query
+        name: path
+        type: string
+      - description: service type
+        in: query
+        name: type
+        type: string
+      - description: service id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 ServiceMeta
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/controllers.ServiceMeta'
+                  type: array
+              type: object
+      summary: 获取服务列表
+      tags:
+      - 服务
 swagger: "2.0"

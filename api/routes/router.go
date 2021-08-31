@@ -36,5 +36,29 @@ func InitRouter(r *gin.Engine) {
 			env.PUT("/", (&controllers.Environment{}).Update)
 			env.DELETE("/:id", (&controllers.Environment{}).Delete)
 		}
+
+		// service
+		service := v1.Group("/service")
+		{
+			service.GET("/all", (&controllers.Service{}).All)
+			service.DELETE("/:env/:path/:type/:id", (&controllers.Service{}).Delete)
+		}
+
+		// export
+		promjob := v1.Group("/promjob")
+		{
+			promjob.GET("/", (&controllers.PromJob{}).All)
+			promjob.GET("/:id", (&controllers.PromJob{}).One)
+			promjob.POST("/", (&controllers.PromJob{}).Add)
+			promjob.PUT("/", (&controllers.PromJob{}).Update)
+			promjob.DELETE("/:id", (&controllers.PromJob{}).Delete)
+		}
+
+		// prom
+		prom := v1.Group("/prom")
+		{
+			prom.GET("/conf", (&controllers.Prom{}).BuildConfiger)
+			prom.POST("/reload", (&controllers.Prom{}).Reload)
+		}
 	}
 }

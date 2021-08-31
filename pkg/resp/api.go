@@ -19,6 +19,7 @@ const (
 	StatusCache    = 800
 	StatusEtcd     = 900
 	StatusProxy    = 1000
+	StatusHttp     = 1100
 )
 
 func NewSuccess(data interface{}) (res *Response) {
@@ -55,6 +56,8 @@ var (
 	ErrWriteFile    = &Response{StatusSystem, 10003, "服务器错误", "写文件出错", nil, nil}
 	ErrSystem       = &Response{StatusSystem, 10004, "服务器错误", "操作系统错误", nil, nil}
 	ErrTransferData = &Response{StatusSystem, 10005, "数据转换错误", "Json 字符串转 Map 错误", nil, nil}
+	ErrNewTmpl      = &Response{StatusSystem, 10006, "数据转换错误", "Tmpl 模板文件解析错误", nil, nil}
+	ErrTransferTmpl = &Response{StatusSystem, 10006, "数据转换错误", "Tmpl 模板文件转换错误", nil, nil}
 )
 
 var (
@@ -92,4 +95,11 @@ var (
 
 var (
 	ErrProxyInput = &Response{StatusProxy, 10001, "网关代理错误", "无效的代理地址！", nil, nil}
+)
+
+var (
+	ErrHttpRequest      = &Response{StatusHttp, 10001, "Http代理错误", "发送Http请求错误！", nil, nil}
+	ErrHttpRequestData  = &Response{StatusHttp, 10002, "Http代理错误", "设置Http请求数据错误！", nil, nil}
+	ErrHttpResponse     = &Response{StatusHttp, 10003, "Http代理错误", "获取Http响应数据错误！", nil, nil}
+	ErrHttpResponseData = &Response{StatusHttp, 10004, "Http代理错误", "解析Http响应数据错误！", nil, nil}
 )

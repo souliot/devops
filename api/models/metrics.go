@@ -16,10 +16,10 @@ var (
 
 type Metrics struct{}
 
-func (m *Metrics) Init() {
+func (m *Metrics) Init(name string) {
 	r := prometheus.NewRegistry()
 	system.RegisterSystemCollector(r)
-	service.RegisterServiceCollector(r, &service.RegisterOptions{"loghub"})
+	service.RegisterServiceCollector(r, &service.RegisterOptions{name})
 
 	Handler = promhttp.HandlerFor(
 		prometheus.Gatherers{r},

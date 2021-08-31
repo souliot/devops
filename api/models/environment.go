@@ -2,7 +2,14 @@ package models
 
 import (
 	"devops/pkg/resp"
+	"fmt"
+	"reflect"
+	"sort"
 	"time"
+
+	"github.com/souliot/siot-orm/orm"
+
+	"github.com/souliot/gateway/master"
 )
 
 type Environment struct {
@@ -15,16 +22,30 @@ type Environment struct {
 }
 
 func (m *Environment) Add() (errC *resp.Response, err error) {
+	cond := orm.NewCondition()
+	cond = cond.And("Name", m.Name).Or("EtcdEndpoints", m.EtcdEndpoints)
+	exist := o.QueryTable(&Environment{}).SetCond(cond).Exist()
+	if exist {
+		err = fmt.Errorf("环境名称及地址重复!")
+		errC = resp.ErrDupRecord
+		errC.MoreInfo = "环境名称及地址重复!"
+		return
+	}
 	m.CreateTime = time.Now().Unix()
-	o.ReadOrCreate(m, "Name", "EtcdEndpoints")
+	_, err = o.Insert(m)
 	if err != nil {
 		errC = resp.ErrDbInsert
 		errC.MoreInfo = err.Error()
+		return
 	}
+	m.Watch(DefaultService)
 	return
 }
 
 func (m *Environment) All() (res []*Environment, errC *resp.Response, err error) {
+	if m.PageQuery == nil {
+		m.PageQuery = DefaultPageQuery
+	}
 	res = make([]*Environment, 0)
 	qs := o.QueryTable(&Environment{})
 	if m.Name != "" {
@@ -57,15 +78,65 @@ func (m *Environment) Delete() (errC *resp.Response, err error) {
 		errC.MoreInfo = err.Error()
 		return
 	}
+	DefaultService.StopEnv(m.Name)
 	return
 }
 
 func (m *Environment) Update() (errC *resp.Response, err error) {
+	m_old := new(Environment)
+	m_old.Id = m.Id
+	err = o.Read(m_old)
+	if err != nil {
+		errC = resp.ErrNoRecord
+		errC.MoreInfo = err.Error()
+		return
+	}
+	cond := orm.NewCondition()
+	cond = cond.And("_id__ne", m.Id).And("Name", m.Name).Or("EtcdEndpoints", m.EtcdEndpoints)
+	exist := o.QueryTable(&Environment{}).SetCond(cond).Exist()
+	if exist {
+		err = fmt.Errorf("环境名称及地址重复!")
+		errC = resp.ErrDupRecord
+		errC.MoreInfo = "环境名称及地址重复!"
+		return
+	}
+
 	_, err = o.Update(m)
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
 		return
+	}
+	addrs_old := sort.StringSlice(m_old.EtcdEndpoints)
+	addrs := sort.StringSlice(m.EtcdEndpoints)
+	sort.Sort(addrs_old)
+	sort.Sort(addrs)
+
+	if !reflect.DeepEqual(addrs_old, addrs) {
+		DefaultService.StopEnv(m.Name)
+		m.Watch(DefaultService)
+	}
+	return
+}
+
+func (m *Environment) Watch(ser *Service) (err error) {
+	if len(m.EtcdEndpoints) <= 0 {
+		return
+	}
+	op := &master.ServiceOption{}
+	ms, err := master.OnWatchService(m.EtcdEndpoints, op, 10*time.Second)
+	if err != nil {
+		return
+	}
+	go func() {
+		for {
+			select {
+			case <-ms.IsUpdate:
+			}
+		}
+	}()
+	if ser.watchCache != nil {
+		ser.watchCache.Store(m.Name, ms)
 	}
 	return
 }

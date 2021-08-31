@@ -20,7 +20,7 @@ type Environment struct {
 // @Param address  query string false "node address"
 // @Param page 		 query string false "page"
 // @Param pageSize query string false "pageSize"
-// @Success 200 {object}	resp.Response{data=[]models.Environment}
+// @Success 200 {object}	resp.Response{data=[]models.Environment} "返回数据 []Environment"
 // @Router /env [get]
 func (c *Environment) All(ctx *gin.Context) {
 	m := &models.Environment{PageQuery: &models.PageQuery{}}
@@ -30,7 +30,7 @@ func (c *Environment) All(ctx *gin.Context) {
 
 	exs, errC, err := m.All()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(exs))
@@ -42,7 +42,7 @@ func (c *Environment) All(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param id path string true "node id"
-// @Success 200 {object}	resp.Response{data=models.Environment}
+// @Success 200 {object}	resp.Response{data=models.Environment} "返回数据 Environment"
 // @Router /env/{id} [get]
 func (c *Environment) One(ctx *gin.Context) {
 	m := new(models.Environment)
@@ -52,7 +52,7 @@ func (c *Environment) One(ctx *gin.Context) {
 	}
 	errC, err := m.One()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -64,7 +64,7 @@ func (c *Environment) One(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param object body models.Environment true "环境节点"
-// @Success 200 {object}	resp.Response{data=models.Environment}
+// @Success 200 {object}	resp.Response{data=models.Environment} "返回数据 Environment"
 // @Router /env [post]
 func (c *Environment) Add(ctx *gin.Context) {
 	m := new(models.Environment)
@@ -75,7 +75,7 @@ func (c *Environment) Add(ctx *gin.Context) {
 
 	errC, err := m.Add()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -87,7 +87,7 @@ func (c *Environment) Add(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param object body models.Environment true "环境节点"
-// @Success 200 {object}	resp.Response{data=models.Environment}
+// @Success 200 {object}	resp.Response{data=models.Environment} "返回数据 Environment"
 // @Router /env [put]
 func (c *Environment) Update(ctx *gin.Context) {
 	m := new(models.Environment)
@@ -98,7 +98,7 @@ func (c *Environment) Update(ctx *gin.Context) {
 
 	errC, err := m.Update()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -110,7 +110,7 @@ func (c *Environment) Update(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param id path string true "node id"
-// @Success 200 {object}	resp.Response{data=models.Environment}
+// @Success 200 {object}	resp.Response{data=models.Environment} "返回数据 Environment"
 // @Router /env/{id} [delete]
 func (c *Environment) Delete(ctx *gin.Context) {
 	m := new(models.Environment)
@@ -120,7 +120,7 @@ func (c *Environment) Delete(ctx *gin.Context) {
 	}
 	errC, err := m.Delete()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))

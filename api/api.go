@@ -7,6 +7,7 @@ import (
 	"devops/pkg/db"
 	"devops/pkg/trans"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	logs "github.com/souliot/siot-log"
@@ -20,6 +21,10 @@ func NewServer(ops ...config.Option) (m *Server) {
 	config.InitConfig()
 	cfg := config.DefaultServerCfg
 	cfg.Apply(ops)
+	if cfg.LocalIP == "" {
+		cfg.LocalIP = config.GetIPStr()
+	}
+	config.InitLog(cfg)
 	return &Server{
 		cfg: cfg,
 	}
@@ -34,13 +39,18 @@ func (s *Server) Start() {
 	}
 	db.InitMongo(ms)
 	trans.InitTrans("zh")
-	models.DefaultMetrics.Init()
+	models.DefaultMetrics.Init(s.cfg.AppName)
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	routes.InitRouter(r)
+	models.InitModels()
+	models.DefaultService.Watch()
+	paddr := s.cfg.PromAddress
+	paddr = strings.TrimPrefix(paddr, "http://")
+	paddr = strings.TrimPrefix(paddr, "https://")
+	models.PromAddress = paddr
 	go r.Run(fmt.Sprintf(":%d", s.cfg.HttpPort))
 	logs.Info("API Server 启动成功，端口：%d", s.cfg.HttpPort)
-	models.InitModels()
 }
 
 func (s *Server) SaveConfig() {

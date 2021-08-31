@@ -14,11 +14,17 @@ var (
 )
 
 type ServerCfg struct {
-	HttpPort   int      `mapstructure:"httpport"`
-	DBHost     []string `mapstructure:"dbhost"`
-	DBName     string   `mapstructure:"dbname"`
-	DBUser     string   `mapstructure:"dbuser"`
-	DBPassword string   `mapstructure:"dbpassword"`
+	AppName     string   `mapstructure:"appname"`
+	Version     string   `mapstructure:"version"`
+	LogLevel    int      `mapstructure:"loglevel"`
+	LogPath     string   `mapstructure:"logpath"`
+	LocalIP     string   `mapstructure:"localip"`
+	HttpPort    int      `mapstructure:"httpport"`
+	PromAddress string   `mapstructure:"promaddress"`
+	DBHost      []string `mapstructure:"dbhost"`
+	DBName      string   `mapstructure:"dbname"`
+	DBUser      string   `mapstructure:"dbuser"`
+	DBPassword  string   `mapstructure:"dbpassword"`
 }
 
 var Config *viper.Viper
@@ -43,11 +49,16 @@ func InitConfig() {
 type Option func(*ServerCfg)
 
 var DefaultServerCfg = &ServerCfg{
-	HttpPort:   8080,
-	DBHost:     []string{"localhost:27017"},
-	DBName:     "",
-	DBUser:     "",
-	DBPassword: "",
+	AppName:     "devops",
+	Version:     "1.0.0",
+	LogLevel:    logs.LevelInfo,
+	LogPath:     "logs",
+	HttpPort:    8080,
+	PromAddress: "localhost:9090",
+	DBHost:      []string{"localhost:27017"},
+	DBName:      "",
+	DBUser:      "",
+	DBPassword:  "",
 }
 
 func (c *ServerCfg) Apply(opts []Option) {
@@ -62,6 +73,18 @@ func (c *ServerCfg) SaveConfigFile() (err error) {
 	}
 	err = Config.WriteConfigAs(Config.ConfigFileUsed())
 	return
+}
+
+func WithAppName(name string) Option {
+	return func(c *ServerCfg) {
+		c.AppName = name
+	}
+}
+
+func WithVersion(v string) Option {
+	return func(c *ServerCfg) {
+		c.Version = v
+	}
 }
 
 func WithHttpPort(p int) Option {

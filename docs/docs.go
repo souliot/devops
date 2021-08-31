@@ -69,7 +69,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 []Environment",
                         "schema": {
                             "allOf": [
                                 {
@@ -116,7 +116,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Environment",
                         "schema": {
                             "allOf": [
                                 {
@@ -160,7 +160,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Environment",
                         "schema": {
                             "allOf": [
                                 {
@@ -204,7 +204,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Environment",
                         "schema": {
                             "allOf": [
                                 {
@@ -246,7 +246,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Environment",
                         "schema": {
                             "allOf": [
                                 {
@@ -307,7 +307,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 []Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -354,7 +354,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -398,7 +398,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -428,7 +428,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "监控"
+                    "Prom"
                 ],
                 "summary": "获取监控节点",
                 "parameters": [
@@ -438,11 +438,17 @@ var doc = `{
                         "name": "type",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "node env",
+                        "name": "env",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -486,7 +492,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -528,7 +534,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "返回数据 Export",
                         "schema": {
                             "allOf": [
                                 {
@@ -547,9 +553,459 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/prom/conf": {
+            "get": {
+                "description": "生成Prom配置文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prom"
+                ],
+                "summary": "生成Prom配置文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "生成配置文件路径",
+                        "name": "path",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "抓取时间间隔",
+                        "name": "scrapeInterval",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "报警检测时间间隔",
+                        "name": "evaluationInterval",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据",
+                        "schema": {
+                            "$ref": "#/definitions/resp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/prom/reload": {
+            "post": {
+                "description": "重载Prom配置文件（热更新）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prom"
+                ],
+                "summary": "重载Prom配置文件",
+                "responses": {
+                    "200": {
+                        "description": "返回数据",
+                        "schema": {
+                            "$ref": "#/definitions/resp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/promjob": {
+            "get": {
+                "description": "获取任务列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "任务"
+                ],
+                "summary": "获取任务列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node address",
+                        "name": "jobName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 []PromJob",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.PromJob"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "修改任务的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "任务"
+                ],
+                "summary": "修改任务",
+                "parameters": [
+                    {
+                        "description": "任务节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PromJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 PromJob",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PromJob"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "添加任务的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "任务"
+                ],
+                "summary": "添加任务",
+                "parameters": [
+                    {
+                        "description": "任务节点",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PromJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 PromJob",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PromJob"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/promjob/{id}": {
+            "get": {
+                "description": "获取任务信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "任务"
+                ],
+                "summary": "获取任务信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 PromJob",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PromJob"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除任务的接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "任务"
+                ],
+                "summary": "删除任务",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 PromJob",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.PromJob"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/service/all": {
+            "get": {
+                "description": "获取服务列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务"
+                ],
+                "summary": "获取服务列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "service env",
+                        "name": "env",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "service path",
+                        "name": "path",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "service type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "service id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回数据 ServiceMeta",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/resp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/controllers.ServiceMeta"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/service/{env}/{path}/{type}/{id}": {
+            "delete": {
+                "description": "删除离线服务节点",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "服务"
+                ],
+                "summary": "删除离线服务节点",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "service env",
+                        "name": "env",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "service path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "service type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "service id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/resp.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "controllers.ServiceMeta": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "ext": {
+                    "type": "object"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metricsAddress": {
+                    "type": "string"
+                },
+                "metricsType": {
+                    "type": "string"
+                },
+                "outAddress": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "typ": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Environment": {
             "type": "object",
             "required": [
@@ -597,6 +1053,10 @@ var doc = `{
                     "description": "创建时间",
                     "type": "integer"
                 },
+                "env": {
+                    "description": "环境名称",
+                    "type": "string"
+                },
                 "id": {
                     "description": "Id",
                     "type": "string"
@@ -610,6 +1070,52 @@ var doc = `{
                 },
                 "type": {
                     "description": "节点类型",
+                    "type": "string"
+                }
+            }
+        },
+        "models.PromJob": {
+            "type": "object",
+            "required": [
+                "configsType",
+                "jobName",
+                "metricsPath",
+                "scheme"
+            ],
+            "properties": {
+                "configsType": {
+                    "description": "配置类型：static || http",
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "Id",
+                    "type": "string"
+                },
+                "jobName": {
+                    "description": "采集任务名称",
+                    "type": "string"
+                },
+                "metricsPath": {
+                    "description": "Metrics Path",
+                    "type": "string"
+                },
+                "scheme": {
+                    "description": "协议 Scheme",
+                    "type": "string"
+                },
+                "targets": {
+                    "description": "static 采集目标",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "url": {
+                    "description": "http 请求地址",
                     "type": "string"
                 }
             }

@@ -20,7 +20,7 @@ type Export struct {
 // @Param address  query string false "node address"
 // @Param page 		 query string false "page"
 // @Param pageSize query string false "pageSize"
-// @Success 200 {object}	resp.Response{data=[]models.Export}
+// @Success 200 {object}	resp.Response{data=[]models.Export} "返回数据 []Export"
 // @Router /export [get]
 func (c *Export) All(ctx *gin.Context) {
 	m := &models.Export{PageQuery: &models.PageQuery{}}
@@ -31,7 +31,7 @@ func (c *Export) All(ctx *gin.Context) {
 
 	exs, errC, err := m.All()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(exs))
@@ -43,7 +43,7 @@ func (c *Export) All(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param id path string true "node id"
-// @Success 200 {object}	resp.Response{data=models.Export}
+// @Success 200 {object}	resp.Response{data=models.Export} "返回数据 Export"
 // @Router /export/{id} [get]
 func (c *Export) One(ctx *gin.Context) {
 	m := new(models.Export)
@@ -53,32 +53,34 @@ func (c *Export) One(ctx *gin.Context) {
 	}
 	errC, err := m.One()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
 }
 
-// @Tags 监控
+// @Tags Prom
 // @Summary  获取监控节点
 // @Description 获取 Prometheus http_sd_config 的接口
 // @Accept  json
 // @Produce json
 // @Param type path string true "node type"
-// @Success 200 {object}	resp.Response{data=models.Export}
+// @Param env query string false "node env"
+// @Success 200 {object}	resp.Response{data=models.Export} "返回数据 Export"
 // @Router /export/type/{type} [get]
 func (c *Export) Node(ctx *gin.Context) {
 	m := new(models.Export)
 	m.Type = ctx.Param("type")
+	m.Env = ctx.Query("env")
 	if !c.CheckParams(ctx, m.Type) {
 		return
 	}
-	ex, errC, err := m.Node()
+	res, errC, err := m.Node()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
-	ctx.JSON(200, resp.NewSuccess(ex))
+	ctx.JSON(200, res)
 }
 
 // @Tags 监控
@@ -87,10 +89,11 @@ func (c *Export) Node(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param object body models.Export true "监控节点"
-// @Success 200 {object}	resp.Response{data=models.Export}
+// @Success 200 {object}	resp.Response{data=models.Export} "返回数据 Export"
 // @Router /export [post]
 func (c *Export) Add(ctx *gin.Context) {
 	m := new(models.Export)
+	m.Targets = make([]string, 0)
 	if err := ctx.ShouldBind(m); err != nil {
 		c.CheckError(err, ctx)
 		return
@@ -98,7 +101,7 @@ func (c *Export) Add(ctx *gin.Context) {
 
 	errC, err := m.Add()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -110,10 +113,11 @@ func (c *Export) Add(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param object body models.Export true "监控节点"
-// @Success 200 {object}	resp.Response{data=models.Export}
+// @Success 200 {object}	resp.Response{data=models.Export} "返回数据 Export"
 // @Router /export [put]
 func (c *Export) Update(ctx *gin.Context) {
 	m := new(models.Export)
+	m.Targets = make([]string, 0)
 	if err := ctx.ShouldBind(m); err != nil {
 		c.CheckError(err, ctx)
 		return
@@ -121,7 +125,7 @@ func (c *Export) Update(ctx *gin.Context) {
 
 	errC, err := m.Update()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -133,7 +137,7 @@ func (c *Export) Update(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param id path string true "node id"
-// @Success 200 {object}	resp.Response{data=models.Export}
+// @Success 200 {object}	resp.Response{data=models.Export} "返回数据 Export"
 // @Router /export/{id} [delete]
 func (c *Export) Delete(ctx *gin.Context) {
 	m := new(models.Export)
@@ -143,7 +147,7 @@ func (c *Export) Delete(ctx *gin.Context) {
 	}
 	errC, err := m.Delete()
 	if err != nil {
-		ctx.JSON(200, errC)
+		ctx.JSON(errC.Status, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
