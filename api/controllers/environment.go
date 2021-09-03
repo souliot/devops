@@ -16,8 +16,7 @@ type Environment struct {
 // @Description 获取环境列表
 // @Accept  json
 // @Produce json
-// @Param type 	   query string false "node type"
-// @Param address  query string false "node address"
+// @Param name 	   query string false "node type"
 // @Param page 		 query string false "page"
 // @Param pageSize query string false "pageSize"
 // @Success 200 {object}	resp.Response{data=[]models.Environment} "返回数据 []Environment"
@@ -30,7 +29,7 @@ func (c *Environment) All(ctx *gin.Context) {
 
 	exs, errC, err := m.All()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(exs))
@@ -52,7 +51,7 @@ func (c *Environment) One(ctx *gin.Context) {
 	}
 	errC, err := m.One()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -75,7 +74,7 @@ func (c *Environment) Add(ctx *gin.Context) {
 
 	errC, err := m.Add()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -98,7 +97,7 @@ func (c *Environment) Update(ctx *gin.Context) {
 
 	errC, err := m.Update()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -120,7 +119,7 @@ func (c *Environment) Delete(ctx *gin.Context) {
 	}
 	errC, err := m.Delete()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))

@@ -21,6 +21,7 @@ type ServerCfg struct {
 	LocalIP     string   `mapstructure:"localip"`
 	HttpPort    int      `mapstructure:"httpport"`
 	PromAddress string   `mapstructure:"promaddress"`
+	TokenExp    int      `mapstructure:"tokenexp"`
 	DBHost      []string `mapstructure:"dbhost"`
 	DBName      string   `mapstructure:"dbname"`
 	DBUser      string   `mapstructure:"dbuser"`
@@ -55,6 +56,7 @@ var DefaultServerCfg = &ServerCfg{
 	LogPath:     "logs",
 	HttpPort:    8080,
 	PromAddress: "localhost:9090",
+	TokenExp:    24,
 	DBHost:      []string{"localhost:27017"},
 	DBName:      "",
 	DBUser:      "",

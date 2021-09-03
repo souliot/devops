@@ -21,7 +21,7 @@ type Export struct {
 func (m *Export) Add() (errC *resp.Response, err error) {
 	cond := orm.NewCondition()
 	cond = cond.And("Type", m.Type).And("Address", m.Address)
-	exist := o.QueryTable(&Environment{}).SetCond(cond).Exist()
+	exist := o.QueryTable(&Export{}).SetCond(cond).Exist()
 	if exist {
 		err = fmt.Errorf("节点类型及地址重复!")
 		errC = resp.ErrDupRecord
@@ -37,11 +37,12 @@ func (m *Export) Add() (errC *resp.Response, err error) {
 	return
 }
 
-func (m *Export) All() (res []*Export, errC *resp.Response, err error) {
+func (m *Export) All() (ls *List, errC *resp.Response, err error) {
 	if m.PageQuery == nil {
 		m.PageQuery = DefaultPageQuery
 	}
-	res = make([]*Export, 0)
+	ls = new(List)
+	res := make([]*Export, 0)
 	qs := o.QueryTable(&Export{})
 	if m.Type != "" {
 		qs = qs.Filter("Type", m.Type)
@@ -50,12 +51,20 @@ func (m *Export) All() (res []*Export, errC *resp.Response, err error) {
 		qs = qs.Filter("Address__regex", m.Address)
 	}
 
-	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("-CreateTime").All(&res)
+	cnt, err := qs.Count()
+	if err != nil {
+		errC = resp.ErrDbRead
+		return
+	}
+
+	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("CreateTime").All(&res)
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
 		return
 	}
+	ls.Lists = res
+	ls.Total = cnt
 	return
 }
 
@@ -82,14 +91,14 @@ func (m *Export) Delete() (errC *resp.Response, err error) {
 func (m *Export) Update() (errC *resp.Response, err error) {
 	cond := orm.NewCondition()
 	cond = cond.And("_id__ne", m.Id).And("Type", m.Type).And("Address", m.Address)
-	exist := o.QueryTable(&Environment{}).SetCond(cond).Exist()
+	exist := o.QueryTable(&Export{}).SetCond(cond).Exist()
 	if exist {
 		err = fmt.Errorf("节点类型及地址重复!")
 		errC = resp.ErrDupRecord
 		errC.MoreInfo = "节点类型及地址重复!"
 		return
 	}
-	_, err = o.Update(m)
+	_, err = o.Update(m, "Env", "Type", "Address")
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
@@ -128,6 +137,12 @@ func (m *Export) Node() (res []*Export, errC *resp.Response, err error) {
 	ex := &Export{
 		Targets: targets,
 	}
-	res = []*Export{ex}
+	if len(ex.Targets) <= 0 {
+		err = fmt.Errorf("该类型未配置监控目标！")
+		errC = resp.ErrNoRecord
+		errC.MoreInfo = "该类型未配置监控目标！"
+		return
+	}
+	res = append(res, ex)
 	return
 }

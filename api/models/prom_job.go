@@ -36,6 +36,13 @@ func (m *PromJob) Add() (errC *resp.Response, err error) {
 		errC.MoreInfo = "任务名称及地址重复!"
 		return
 	}
+	switch m.ConfigsType {
+	case "http":
+		m.Targets = make([]string, 0)
+	case "static":
+		m.Url = ""
+	default:
+	}
 	m.CreateTime = time.Now().Unix()
 	_, err = o.Insert(m)
 	if err != nil {
@@ -46,22 +53,32 @@ func (m *PromJob) Add() (errC *resp.Response, err error) {
 	return
 }
 
-func (m *PromJob) All() (res []*PromJob, errC *resp.Response, err error) {
+func (m *PromJob) All() (ls *List, errC *resp.Response, err error) {
 	if m.PageQuery == nil {
 		m.PageQuery = DefaultPageQuery
 	}
-	res = make([]*PromJob, 0)
+	ls = new(List)
+	res := make([]*PromJob, 0)
 	qs := o.QueryTable(&PromJob{})
 	if m.JobName != "" {
 		qs = qs.Filter("JobName__regex", m.JobName)
 	}
 
-	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("-CreateTime").All(&res)
+	cnt, err := qs.Count()
+	if err != nil {
+		errC = resp.ErrDbRead
+		return
+	}
+
+	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("JobName").All(&res)
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
 		return
 	}
+
+	ls.Lists = res
+	ls.Total = cnt
 	return
 }
 
@@ -89,10 +106,10 @@ func (m *PromJob) Update() (errC *resp.Response, err error) {
 	cond := orm.NewCondition()
 	cond = cond.And("_id__ne", m.Id).And("JobName", m.JobName)
 	if len(m.Targets) > 0 {
-		cond = cond.Or("Targets", m.Targets)
+		cond = cond.And("Targets", m.Targets)
 	}
 	if m.Url != "" {
-		cond = cond.Or("Url", m.Url)
+		cond = cond.And("Url", m.Url)
 	}
 	exist := o.QueryTable(&PromJob{}).SetCond(cond).Exist()
 	if exist {
@@ -101,8 +118,14 @@ func (m *PromJob) Update() (errC *resp.Response, err error) {
 		errC.MoreInfo = "任务名称及地址重复!"
 		return
 	}
-
-	_, err = o.Update(m)
+	switch m.ConfigsType {
+	case "http":
+		m.Targets = make([]string, 0)
+	case "static":
+		m.Url = ""
+	default:
+	}
+	_, err = o.Update(m, "JobName", "MetricsPath", "Scheme", "ConfigsType", "Targets", "Url")
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()

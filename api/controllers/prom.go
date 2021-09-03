@@ -29,7 +29,7 @@ func (c *Prom) BuildConfiger(ctx *gin.Context) {
 
 	errC, err := m.BuildConfiger()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.RespSuccess)
@@ -47,7 +47,7 @@ func (c *Prom) Reload(ctx *gin.Context) {
 
 	errC, err := m.Reload()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.RespSuccess)

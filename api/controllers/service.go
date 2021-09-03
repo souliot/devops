@@ -32,7 +32,7 @@ func (c *Service) All(ctx *gin.Context) {
 
 	res, errC, err := models.DefaultService.All(req)
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(res))
@@ -60,7 +60,7 @@ func (c *Service) Delete(ctx *gin.Context) {
 	}
 	errC, err := models.DefaultService.Delete()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.RespSuccess)

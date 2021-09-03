@@ -39,11 +39,11 @@ type Prom struct {
 }
 
 func (m *Prom) BuildConfiger() (errC *resp.Response, err error) {
-	jobs, errC, err := (&PromJob{}).All()
+	ls, errC, err := (&PromJob{}).All()
 	if err != nil {
 		return
 	}
-	m.Jobs = jobs
+	m.Jobs = ls.Lists.([]*PromJob)
 	tmpl, err := template.New("prom").Funcs(template.FuncMap{
 		"add": add,
 	}).Parse(PROM_CONF_TPL)

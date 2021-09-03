@@ -15,9 +15,10 @@ type Base struct{}
 func (c *Base) CheckParams(ctx *gin.Context, params ...string) bool {
 	for _, v := range params {
 		if v == "" {
+			ctx.Abort()
 			errC := resp.ErrUserInput
 			errC.MoreInfo = "参数不能为空"
-			ctx.JSON(errC.Status, errC)
+			ctx.JSON(200, errC)
 			return false
 		}
 	}
@@ -63,21 +64,22 @@ func (c *Base) DefaultInt64(ctx *gin.Context, key string, defaultValue int64) (i
 func (c *Base) HandlerNoRouter(ctx *gin.Context) {
 	errC := resp.Err404
 	errC.MoreInfo = "访问页面不存！"
-	ctx.JSON(errC.Status, errC)
+	ctx.JSON(200, errC)
 	return
 }
 
 func (c *Base) CheckError(err error, ctx *gin.Context) {
+	ctx.Abort()
 	errs, ok := err.(validator.ValidationErrors)
 	if !ok {
 		errC := resp.ErrUserInput
 		errC.MoreInfo = err.Error()
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	errC := resp.ErrUserInput
 	errC.MoreInfo = removeTopStruct(errs.Translate(trans.Trans))
-	ctx.JSON(errC.Status, errC)
+	ctx.JSON(200, errC)
 	return
 }
 

@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/souliot/gateway/master"
-	logs "github.com/souliot/siot-log"
 )
 
 type ServiceRequest struct {
@@ -33,23 +32,24 @@ type ServiceResponse struct {
 
 func (m *Service) Watch() {
 	env := new(Environment)
-	evs, _, err := env.All()
+	ls, _, err := env.All()
 	if err != nil {
 		return
 	}
-	for _, v := range evs {
-		v.Watch(m)
+	for _, v := range ls.Lists.([]*Environment) {
+		go v.Watch(m)
 	}
 }
 
-func (m *Service) All(req *ServiceRequest) (res []*ServiceResponse, errC *resp.Response, err error) {
+func (m *Service) All(req *ServiceRequest) (ls *List, errC *resp.Response, err error) {
 	op := &master.ServiceOption{
 		Path:        req.Path,
 		Typ:         req.Typ,
 		Id:          req.Id,
 		MetricsType: master.MetricsType(req.MetricsType),
 	}
-	res = make([]*ServiceResponse, 0)
+	ls = new(List)
+	res := make([]*ServiceResponse, 0)
 	if req.Env == "" {
 		m.watchCache.Range(func(k, v interface{}) bool {
 			if ms, ok := v.(*master.Master); ok {
@@ -67,6 +67,8 @@ func (m *Service) All(req *ServiceRequest) (res []*ServiceResponse, errC *resp.R
 			}
 			return true
 		})
+		ls.Total = int64(len(res))
+		ls.Lists = res
 		return
 	}
 	if msi, loaded := m.watchCache.Load(req.Env); loaded {
@@ -75,7 +77,7 @@ func (m *Service) All(req *ServiceRequest) (res []*ServiceResponse, errC *resp.R
 			if err != nil {
 				errC = resp.ErrEtcdGet
 				errC.MoreInfo = err.Error()
-				return res, errC, err
+				return nil, errC, err
 			}
 			for _, v := range sms {
 				sr := &ServiceResponse{
@@ -86,17 +88,20 @@ func (m *Service) All(req *ServiceRequest) (res []*ServiceResponse, errC *resp.R
 			}
 		}
 	}
+	ls.Total = int64(len(res))
+	ls.Lists = res
 	return
 }
 
-func (m *Service) Online(req *ServiceRequest) (res []*master.ServiceMeta, errC *resp.Response, err error) {
+func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, err error) {
 	op := &master.ServiceOption{
 		Path:        req.Path,
 		Typ:         req.Typ,
 		Id:          req.Id,
 		MetricsType: master.MetricsType(req.MetricsType),
 	}
-	res = make([]*master.ServiceMeta, 0)
+	ls = new(List)
+	res := make([]*master.ServiceMeta, 0)
 	if req.Env == "" {
 		m.watchCache.Range(func(k, v interface{}) bool {
 			if ms, ok := v.(*master.Master); ok {
@@ -116,18 +121,20 @@ func (m *Service) Online(req *ServiceRequest) (res []*master.ServiceMeta, errC *
 			if err != nil {
 				errC = resp.ErrEtcdGet
 				errC.MoreInfo = err.Error()
-				return res, errC, err
+				return nil, errC, err
 			}
 			res = append(res, sms...)
 		}
 	}
+	ls.Total = int64(len(res))
+	ls.Lists = res
 	return
 }
 
 func (m *Service) Stop() {
 	m.watchCache.Range(func(k, v interface{}) bool {
 		if ms, ok := v.(*master.Master); ok {
-			ms.Stop()
+			go ms.Stop()
 		}
 		return true
 	})
@@ -144,7 +151,6 @@ func (m *Service) Delete() (errC *resp.Response, err error) {
 }
 
 func (m *Service) StopEnv(name string) {
-	logs.Info("Stop Env")
 	if msi, loaded := m.watchCache.LoadAndDelete(name); loaded {
 		if ms, ok := msi.(*master.Master); ok {
 			ms.Stop()

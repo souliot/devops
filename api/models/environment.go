@@ -38,26 +38,36 @@ func (m *Environment) Add() (errC *resp.Response, err error) {
 		errC.MoreInfo = err.Error()
 		return
 	}
-	m.Watch(DefaultService)
+	go m.Watch(DefaultService)
 	return
 }
 
-func (m *Environment) All() (res []*Environment, errC *resp.Response, err error) {
+func (m *Environment) All() (ls *List, errC *resp.Response, err error) {
 	if m.PageQuery == nil {
 		m.PageQuery = DefaultPageQuery
 	}
-	res = make([]*Environment, 0)
+	ls = new(List)
+	res := make([]*Environment, 0)
 	qs := o.QueryTable(&Environment{})
 	if m.Name != "" {
 		qs = qs.Filter("Name__regex", m.Name)
 	}
 
-	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("-CreateTime").All(&res)
+	cnt, err := qs.Count()
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
 		return
 	}
+
+	err = qs.Limit(m.PageSize, (m.Page-1)*m.PageSize).OrderBy("CreateTime").All(&res)
+	if err != nil {
+		errC = resp.ErrDbRead
+		errC.MoreInfo = err.Error()
+		return
+	}
+	ls.Lists = res
+	ls.Total = cnt
 	return
 }
 
@@ -92,7 +102,9 @@ func (m *Environment) Update() (errC *resp.Response, err error) {
 		return
 	}
 	cond := orm.NewCondition()
-	cond = cond.And("_id__ne", m.Id).And("Name", m.Name).Or("EtcdEndpoints", m.EtcdEndpoints)
+	cond1 := orm.NewCondition()
+	cond1 = cond1.And("Name", m.Name).Or("EtcdEndpoints", m.EtcdEndpoints)
+	cond = cond.And("_id__ne", m.Id).AndCond(cond1)
 	exist := o.QueryTable(&Environment{}).SetCond(cond).Exist()
 	if exist {
 		err = fmt.Errorf("环境名称及地址重复!")
@@ -101,7 +113,7 @@ func (m *Environment) Update() (errC *resp.Response, err error) {
 		return
 	}
 
-	_, err = o.Update(m)
+	_, err = o.Update(m, "Name", "EtcdEndpoints", "Desc")
 	if err != nil {
 		errC = resp.ErrDbRead
 		errC.MoreInfo = err.Error()
@@ -114,7 +126,7 @@ func (m *Environment) Update() (errC *resp.Response, err error) {
 
 	if !reflect.DeepEqual(addrs_old, addrs) {
 		DefaultService.StopEnv(m.Name)
-		m.Watch(DefaultService)
+		go m.Watch(DefaultService)
 	}
 	return
 }

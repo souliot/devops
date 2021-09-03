@@ -29,7 +29,7 @@ func (c *PromJob) All(ctx *gin.Context) {
 
 	exs, errC, err := m.All()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(exs))
@@ -51,7 +51,7 @@ func (c *PromJob) One(ctx *gin.Context) {
 	}
 	errC, err := m.One()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -76,13 +76,13 @@ func (c *PromJob) Add(ctx *gin.Context) {
 	if len(m.Targets) <= 0 && m.Url == "" {
 		errC := resp.ErrUserInput
 		errC.MoreInfo = "targets 跟 url 不能同时为空！"
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 
 	errC, err := m.Add()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -107,13 +107,13 @@ func (c *PromJob) Update(ctx *gin.Context) {
 	if len(m.Targets) <= 0 && m.Url == "" {
 		errC := resp.ErrUserInput
 		errC.MoreInfo = "targets 跟 url 不能同时为空！"
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 
 	errC, err := m.Update()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -135,7 +135,7 @@ func (c *PromJob) Delete(ctx *gin.Context) {
 	}
 	errC, err := m.Delete()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))

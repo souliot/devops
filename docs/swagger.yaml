@@ -106,6 +106,40 @@ definitions:
     - metricsPath
     - scheme
     type: object
+  models.User:
+    properties:
+      createTime:
+        description: 创建时间
+        type: integer
+      id:
+        description: 用户ID
+        type: string
+      ids:
+        description: Ids
+        items:
+          type: string
+        type: array
+      password:
+        description: 登陆密码
+        type: string
+      realName:
+        description: 用户姓名
+        type: string
+      roles:
+        description: 用户角色
+        items:
+          type: string
+        type: array
+      salt:
+        description: 密码加密
+        type: string
+      username:
+        description: 登陆名
+        type: string
+    required:
+    - password
+    - username
+    type: object
   resp.Response:
     properties:
       code:
@@ -707,4 +741,221 @@ paths:
       summary: 获取服务列表
       tags:
       - 服务
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户列表
+      parameters:
+      - description: node address
+        in: query
+        name: name
+        type: string
+      - description: node address
+        in: query
+        name: userName
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 []User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: 获取用户列表
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      description: 添加用户的接口
+      parameters:
+      - description: 用户
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 添加用户
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 修改用户的接口
+      parameters:
+      - description: 用户
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 修改用户
+      tags:
+      - 用户
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除用户的接口
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 删除用户
+      tags:
+      - 用户
+    get:
+      consumes:
+      - application/json
+      description: 获取用户信息
+      parameters:
+      - description: node id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 获取用户信息
+      tags:
+      - 用户
+  /user/getUserInfo:
+    get:
+      consumes:
+      - application/json
+      description: 获取登录用户信息的接口
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 获取登录用户信息
+      tags:
+      - 用户
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录的接口
+      parameters:
+      - description: 用户
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            allOf:
+            - $ref: '#/definitions/resp.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: 用户登录
+      tags:
+      - 用户
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: 用户登出的接口
+      parameters:
+      - description: 用户
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回数据 User
+          schema:
+            $ref: '#/definitions/resp.Response'
+      summary: 用户登出
+      tags:
+      - 用户
 swagger: "2.0"

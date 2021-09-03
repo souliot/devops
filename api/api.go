@@ -49,6 +49,7 @@ func (s *Server) Start() {
 	paddr = strings.TrimPrefix(paddr, "http://")
 	paddr = strings.TrimPrefix(paddr, "https://")
 	models.PromAddress = paddr
+	models.TokenExp = s.cfg.TokenExp
 	go r.Run(fmt.Sprintf(":%d", s.cfg.HttpPort))
 	logs.Info("API Server 启动成功，端口：%d", s.cfg.HttpPort)
 }

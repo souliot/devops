@@ -31,7 +31,7 @@ func (c *Export) All(ctx *gin.Context) {
 
 	exs, errC, err := m.All()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(exs))
@@ -53,7 +53,7 @@ func (c *Export) One(ctx *gin.Context) {
 	}
 	errC, err := m.One()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -77,7 +77,7 @@ func (c *Export) Node(ctx *gin.Context) {
 	}
 	res, errC, err := m.Node()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, res)
@@ -101,7 +101,7 @@ func (c *Export) Add(ctx *gin.Context) {
 
 	errC, err := m.Add()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -125,7 +125,7 @@ func (c *Export) Update(ctx *gin.Context) {
 
 	errC, err := m.Update()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
@@ -147,7 +147,7 @@ func (c *Export) Delete(ctx *gin.Context) {
 	}
 	errC, err := m.Delete()
 	if err != nil {
-		ctx.JSON(errC.Status, errC)
+		ctx.JSON(200, errC)
 		return
 	}
 	ctx.JSON(200, resp.NewSuccess(m))
