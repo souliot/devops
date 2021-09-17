@@ -7,9 +7,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/souliot/siot-orm/orm"
+	"public/libs_go/gateway/master"
 
-	"github.com/souliot/gateway/master"
+	"github.com/souliot/siot-orm/orm"
 )
 
 type Environment struct {
@@ -82,9 +82,15 @@ func (m *Environment) One() (errC *resp.Response, err error) {
 }
 
 func (m *Environment) Delete() (errC *resp.Response, err error) {
-	_, err = o.Delete(m)
+	err = o.Read(m)
 	if err != nil {
 		errC = resp.ErrDbRead
+		errC.MoreInfo = err.Error()
+		return
+	}
+	_, err = o.Delete(m)
+	if err != nil {
+		errC = resp.ErrDbDelete
 		errC.MoreInfo = err.Error()
 		return
 	}

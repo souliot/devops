@@ -2,17 +2,18 @@ package models
 
 import (
 	"devops/pkg/resp"
+	"public/libs_go/gateway/master"
+	"sort"
 	"sync"
-
-	"github.com/souliot/gateway/master"
 )
 
 type ServiceRequest struct {
-	Env         string
-	Path        string
-	Typ         string
-	Id          string
-	MetricsType string
+	Env         string `json:"env"`
+	Path        string `json:"path"`
+	Typ         string `json:"typ"`
+	Id          string `json:"id"`
+	OutAddress  string `json:"outAddress"`
+	MetricsType string `json:"metricsType"`
 }
 
 var DefaultService = &Service{
@@ -27,6 +28,7 @@ type ServiceMeta master.ServiceMeta
 
 type ServiceResponse struct {
 	ServiceMeta
+	Env    string
 	Status bool
 }
 
@@ -57,16 +59,19 @@ func (m *Service) All(req *ServiceRequest) (ls *List, errC *resp.Response, err e
 				if err != nil {
 					return true
 				}
+				env := k.(string)
 				for _, v := range sms {
 					sr := &ServiceResponse{
 						ServiceMeta: ServiceMeta(v.Meta),
 						Status:      v.Status,
+						Env:         env,
 					}
 					res = append(res, sr)
 				}
 			}
 			return true
 		})
+		sort.Sort(ServiceResponseList(res))
 		ls.Total = int64(len(res))
 		ls.Lists = res
 		return
@@ -83,11 +88,13 @@ func (m *Service) All(req *ServiceRequest) (ls *List, errC *resp.Response, err e
 				sr := &ServiceResponse{
 					ServiceMeta: ServiceMeta(v.Meta),
 					Status:      v.Status,
+					Env:         req.Env,
 				}
 				res = append(res, sr)
 			}
 		}
 	}
+	sort.Sort(ServiceResponseList(res))
 	ls.Total = int64(len(res))
 	ls.Lists = res
 	return
@@ -101,7 +108,7 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 		MetricsType: master.MetricsType(req.MetricsType),
 	}
 	ls = new(List)
-	res := make([]*master.ServiceMeta, 0)
+	res := make([]*ServiceResponse, 0)
 	if req.Env == "" {
 		m.watchCache.Range(func(k, v interface{}) bool {
 			if ms, ok := v.(*master.Master); ok {
@@ -109,7 +116,15 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 				if err != nil {
 					return true
 				}
-				res = append(res, sms...)
+				env := k.(string)
+				for _, v := range sms {
+					sr := &ServiceResponse{
+						ServiceMeta: ServiceMeta(*v),
+						Status:      true,
+						Env:         env,
+					}
+					res = append(res, sr)
+				}
 			}
 			return true
 		})
@@ -123,7 +138,14 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 				errC.MoreInfo = err.Error()
 				return nil, errC, err
 			}
-			res = append(res, sms...)
+			for _, v := range sms {
+				sr := &ServiceResponse{
+					ServiceMeta: ServiceMeta(*v),
+					Status:      true,
+					Env:         req.Env,
+				}
+				res = append(res, sr)
+			}
 		}
 	}
 	ls.Total = int64(len(res))
@@ -134,7 +156,7 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 func (m *Service) Stop() {
 	m.watchCache.Range(func(k, v interface{}) bool {
 		if ms, ok := v.(*master.Master); ok {
-			go ms.Stop()
+			ms.Stop()
 		}
 		return true
 	})
@@ -150,10 +172,28 @@ func (m *Service) Delete() (errC *resp.Response, err error) {
 	return
 }
 
+func (m *Service) DeleteNode(req *ServiceRequest) (errC *resp.Response, err error) {
+	if msi, loaded := m.watchCache.Load(req.Env); loaded {
+		if ms, ok := msi.(*master.Master); ok {
+			ms.DeleteNode(req.Path, req.Typ, req.Id)
+		}
+	}
+	return
+}
+
+func (m *Service) SetOutAddress(req *ServiceRequest) (errC *resp.Response, err error) {
+	if msi, loaded := m.watchCache.Load(req.Env); loaded {
+		if ms, ok := msi.(*master.Master); ok {
+			ms.SetOutAddress(req.Id, req.OutAddress)
+		}
+	}
+	return
+}
+
 func (m *Service) StopEnv(name string) {
 	if msi, loaded := m.watchCache.LoadAndDelete(name); loaded {
 		if ms, ok := msi.(*master.Master); ok {
-			ms.Stop()
+			go ms.Stop()
 		}
 	}
 }
@@ -171,7 +211,11 @@ func (m *Service) GetExport(env, typ string) (exps []string) {
 					return true
 				}
 				for _, sm := range sms {
-					exps = append(exps, sm.MetricsAddress)
+					addr := sm.OutAddress
+					if addr == "" {
+						addr = sm.Address
+					}
+					exps = append(exps, addr)
 				}
 			}
 			return true
@@ -185,9 +229,55 @@ func (m *Service) GetExport(env, typ string) (exps []string) {
 				return
 			}
 			for _, sm := range sms {
-				exps = append(exps, sm.MetricsAddress)
+				addr := sm.OutAddress
+				if addr == "" {
+					addr = sm.Address
+				}
+				exps = append(exps, addr)
 			}
 		}
 	}
+	return
+}
+
+type ServiceResponseList []*ServiceResponse
+
+func (m ServiceResponseList) Len() int {
+	return len(m)
+}
+
+func (m ServiceResponseList) Less(i, j int) bool {
+	// 环境
+	if m[i].Env < m[j].Env {
+		return true
+	}
+	if m[i].Env > m[j].Env {
+		return false
+	}
+
+	// 集群
+	if m[i].Path < m[j].Path {
+		return true
+	}
+	if m[i].Path > m[j].Path {
+		return false
+	}
+
+	// 服务类型
+	if m[i].Typ < m[j].Typ {
+		return true
+	}
+	if m[i].Typ > m[j].Typ {
+		return false
+	}
+
+	if m[i].ServiceMeta.Id <= m[j].ServiceMeta.Id {
+		return true
+	}
+	return false
+}
+
+func (m ServiceResponseList) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
 	return
 }

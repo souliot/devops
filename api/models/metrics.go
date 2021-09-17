@@ -5,8 +5,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/souliot/gateway/metrics/service"
-	"github.com/souliot/gateway/metrics/system"
+	"public/libs_go/gateway/metrics/service"
+	"public/libs_go/gateway/metrics/system"
 )
 
 var (

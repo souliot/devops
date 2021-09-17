@@ -1,13 +1,13 @@
 global:
-  scrape_interval:     30s
-  evaluation_interval: 10s
+  scrape_interval:     60s
+  evaluation_interval: 60s
 
 scrape_configs:
-  - job_name: system
+  - job_name: etcd14
     metrics_path: /metrics
     scheme: http
-    http_sd_configs:
-      - url: "http://192.168.0.252:8080/v1/export/type/system"
+    static_configs: 
+      - targets: ['192.168.2.14:2379']
 
 
   - job_name: etcd15
@@ -24,6 +24,13 @@ scrape_configs:
       - targets: ['192.168.0.4:2379']
 
 
+  - job_name: masternode
+    metrics_path: /metrics
+    scheme: http
+    http_sd_configs:
+      - url: "http://192.168.0.252:8080/v1/export/type/masternode"
+
+
   - job_name: minio15
     metrics_path: /minio/prometheus/metrics
     scheme: http
@@ -38,6 +45,13 @@ scrape_configs:
       - targets: ['192.168.0.35:9000']
 
 
+  - job_name: minio36
+    metrics_path: /minio/prometheus/metrics
+    scheme: http
+    static_configs: 
+      - targets: ['192.168.2.36:9000','192.168.2.37:9000','192.168.2.38:9000']
+
+
   - job_name: minio4
     metrics_path: /minio/prometheus/metrics
     scheme: http
@@ -45,9 +59,9 @@ scrape_configs:
       - targets: ['192.168.0.4:9000']
 
 
-  - job_name: minio36
-    metrics_path: /minio/prometheus/metrics
+  - job_name: system
+    metrics_path: /metrics
     scheme: http
-    static_configs: 
-      - targets: ['192.168.2.36:9000','192.168.2.37:9000','192.168.2.38:9000']
+    http_sd_configs:
+      - url: "http://192.168.0.252:8080/v1/export/type/system"
 

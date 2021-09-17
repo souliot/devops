@@ -55,7 +55,7 @@ var (
 	Err500          = &Response{StatusSystem, 10002, "服务器错误", "接口访问出错", nil, nil}
 	ErrWriteFile    = &Response{StatusSystem, 10003, "服务器错误", "写文件出错", nil, nil}
 	ErrSystem       = &Response{StatusSystem, 10004, "服务器错误", "操作系统错误", nil, nil}
-	ErrTransferData = &Response{StatusSystem, 10005, "数据转换错误", "Json 字符串转 Map 错误", nil, nil}
+	ErrTransferData = &Response{StatusSystem, 10005, "数据转换错误", "序列化反序列化错误", nil, nil}
 	ErrNewTmpl      = &Response{StatusSystem, 10006, "数据转换错误", "Tmpl 模板文件解析错误", nil, nil}
 	ErrTransferTmpl = &Response{StatusSystem, 10006, "数据转换错误", "Tmpl 模板文件转换错误", nil, nil}
 )

@@ -49,7 +49,7 @@ func (c *Service) All(ctx *gin.Context) {
 // @Param id   path string true "service id"
 // @Success 200 {object}	resp.Response
 // @Router /service/{env}/{path}/{type}/{id} [delete]
-func (c *Service) Delete(ctx *gin.Context) {
+func (c *Service) DeleteNode(ctx *gin.Context) {
 	req := &models.ServiceRequest{}
 	req.Env = ctx.Param("env")
 	req.Path = ctx.Param("path")
@@ -58,7 +58,32 @@ func (c *Service) Delete(ctx *gin.Context) {
 	if !c.CheckParams(ctx, req.Env, req.Path, req.Typ, req.Id) {
 		return
 	}
-	errC, err := models.DefaultService.Delete()
+	errC, err := models.DefaultService.DeleteNode(req)
+	if err != nil {
+		ctx.JSON(200, errC)
+		return
+	}
+	ctx.JSON(200, resp.RespSuccess)
+}
+
+// @Tags 服务
+// @Summary  设置服务外网地址
+// @Description 设置服务外网地址
+// @Accept  json
+// @Produce json
+// @Param object body models.PromJob true "任务节点"
+// @Success 200 {object}	resp.Response
+// @Router /service/outAddress [put]
+func (c *Service) SetOutAddress(ctx *gin.Context) {
+	req := &models.ServiceRequest{}
+	if err := ctx.ShouldBind(req); err != nil {
+		ctx.JSON(200, resp.ErrUserInput)
+		return
+	}
+	if !c.CheckParams(ctx, req.Env, req.Id) {
+		return
+	}
+	errC, err := models.DefaultService.SetOutAddress(req)
 	if err != nil {
 		ctx.JSON(200, errC)
 		return

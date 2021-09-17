@@ -30,18 +30,20 @@ func InitRouter(r *gin.Engine) {
 			user.POST("/logout", (&controllers.User{}).Logout)
 			user.GET("/getUserInfo", (&controllers.User{}).GetUserInfo)
 		}
-		v1.Use((&controllers.Auth{}).Authorize())
 
 		// export
 		export := v1.Group("/export")
 		{
+			export.GET("/type/:type", (&controllers.Export{}).Node)
+			export.Use((&controllers.Auth{}).Authorize())
 			export.GET("", (&controllers.Export{}).All)
 			export.GET("/:id", (&controllers.Export{}).One)
 			export.POST("", (&controllers.Export{}).Add)
 			export.PUT("", (&controllers.Export{}).Update)
 			export.DELETE("/:id", (&controllers.Export{}).Delete)
-			export.GET("/type/:type", (&controllers.Export{}).Node)
 		}
+
+		v1.Use((&controllers.Auth{}).Authorize())
 
 		// env
 		env := v1.Group("/env")
@@ -57,7 +59,8 @@ func InitRouter(r *gin.Engine) {
 		service := v1.Group("/service")
 		{
 			service.GET("/all", (&controllers.Service{}).All)
-			service.DELETE("/:env/:path/:type/:id", (&controllers.Service{}).Delete)
+			service.DELETE("/:env/:path/:type/:id", (&controllers.Service{}).DeleteNode)
+			service.PUT("/outAddress", (&controllers.Service{}).SetOutAddress)
 		}
 
 		// promjob
@@ -75,6 +78,27 @@ func InitRouter(r *gin.Engine) {
 		{
 			prom.GET("/conf", (&controllers.Prom{}).BuildConfiger)
 			prom.POST("/reload", (&controllers.Prom{}).Reload)
+		}
+
+		// globalSetting
+		globalSetting := v1.Group("/globalSetting")
+		{
+			globalSetting.GET("/:env", (&controllers.GlobalSetting{}).GetGlobalSetting)
+			globalSetting.PUT("", (&controllers.GlobalSetting{}).SetGlobalSetting)
+		}
+
+		// typSetting
+		typSetting := v1.Group("/typSetting")
+		{
+			typSetting.GET("/:env/:typ", (&controllers.TypSetting{}).GetTypSetting)
+			typSetting.PUT("", (&controllers.TypSetting{}).SetTypSetting)
+		}
+
+		// appSetting
+		appSetting := v1.Group("/appSetting")
+		{
+			appSetting.GET("/:env/:typ/:id", (&controllers.AppSetting{}).GetAppSetting)
+			appSetting.PUT("", (&controllers.AppSetting{}).SetAppSetting)
 		}
 	}
 }
