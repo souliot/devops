@@ -100,5 +100,11 @@ func InitRouter(r *gin.Engine) {
 			appSetting.GET("/:env/:typ/:id", (&controllers.AppSetting{}).GetAppSetting)
 			appSetting.PUT("", (&controllers.AppSetting{}).SetAppSetting)
 		}
+
+		// controller
+		ctrl := v1.Group("/controller")
+		{
+			ctrl.PUT("", (&controllers.Controller{}).Controller)
+		}
 	}
 }
