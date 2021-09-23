@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"public/libs_go/logs"
 	"strings"
 )
 
@@ -100,4 +101,22 @@ func (m *Prom) Reload() (errC *resp.Response, err error) {
 
 func add(a, b int) int {
 	return a + b
+}
+
+func AutoReload() {
+	m := &Prom{}
+	m.ScrapeInterval = 60
+	m.EvaluationInterval = 60
+
+	_, err := m.BuildConfiger()
+	if err != nil {
+		logs.Error("生成prom配置文件错误：", err)
+		return
+	}
+
+	_, err = m.Reload()
+	if err != nil {
+		logs.Error("热重载prom配置文件错误：", err)
+		return
+	}
 }

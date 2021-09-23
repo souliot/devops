@@ -1,8 +1,8 @@
 httpport: 8080
-promaddress: 192.168.0.4:885
+promaddress: prom:885
 dbtype: mongo
 dbhost:
   - 192.168.0.4:27017
 dbname: Darwin-DevOps
-# dbuser: watrix
-# dbpassword: watrix888
+dbuser: ''
+dbpassword: ''

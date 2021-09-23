@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	logs "github.com/souliot/siot-log"
 	"github.com/spf13/viper"
@@ -42,6 +43,18 @@ func InitConfig() {
 		logs.Info("Using default config")
 	} else {
 		Config.MergeInConfig()
+	}
+
+	// Environment
+	replacer := strings.NewReplacer(".", "_")
+	Config.SetEnvKeyReplacer(replacer)
+	Config.AllowEmptyEnv(true)
+	Config.AutomaticEnv()
+
+	env_hosts_str := Config.GetString("DBHOST")
+	if len(env_hosts_str) > 0 {
+		env_hosts := strings.Split(env_hosts_str, ";")
+		Config.Set("DBHOST", env_hosts)
 	}
 
 	Config.Unmarshal(DefaultServerCfg)

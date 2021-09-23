@@ -50,6 +50,7 @@ func (m *PromJob) Add() (errC *resp.Response, err error) {
 		errC.MoreInfo = err.Error()
 		return
 	}
+	go AutoReload()
 	return
 }
 
@@ -99,6 +100,7 @@ func (m *PromJob) Delete() (errC *resp.Response, err error) {
 		errC.MoreInfo = err.Error()
 		return
 	}
+	go AutoReload()
 	return
 }
 
@@ -131,5 +133,6 @@ func (m *PromJob) Update() (errC *resp.Response, err error) {
 		errC.MoreInfo = err.Error()
 		return
 	}
+	go AutoReload()
 	return
 }
