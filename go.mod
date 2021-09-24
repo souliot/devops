@@ -88,6 +88,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace public => ../public
+// replace public => ../public
+replace public => D:\WorkSpace\watrix\go\src\public
 
 // replace github.com/souliot/siot-orm => D:\WorkSpace\github.com\siot-orm

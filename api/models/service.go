@@ -4,6 +4,7 @@ import (
 	"devops/pkg/resp"
 	"public/libs_go/gateway/master"
 	"sort"
+	"strconv"
 	"sync"
 )
 
@@ -28,8 +29,8 @@ type ServiceMeta master.ServiceMeta
 
 type ServiceResponse struct {
 	ServiceMeta
-	Env    string
-	Status bool
+	Env      string
+	IsOnline bool
 }
 
 func (m *Service) Watch() {
@@ -63,7 +64,7 @@ func (m *Service) All(req *ServiceRequest) (ls *List, errC *resp.Response, err e
 				for _, v := range sms {
 					sr := &ServiceResponse{
 						ServiceMeta: ServiceMeta(v.Meta),
-						Status:      v.Status,
+						IsOnline:    v.Status,
 						Env:         env,
 					}
 					res = append(res, sr)
@@ -87,7 +88,7 @@ func (m *Service) All(req *ServiceRequest) (ls *List, errC *resp.Response, err e
 			for _, v := range sms {
 				sr := &ServiceResponse{
 					ServiceMeta: ServiceMeta(v.Meta),
-					Status:      v.Status,
+					IsOnline:    v.Status,
 					Env:         req.Env,
 				}
 				res = append(res, sr)
@@ -120,7 +121,7 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 				for _, v := range sms {
 					sr := &ServiceResponse{
 						ServiceMeta: ServiceMeta(*v),
-						Status:      true,
+						IsOnline:    true,
 						Env:         env,
 					}
 					res = append(res, sr)
@@ -141,7 +142,7 @@ func (m *Service) Online(req *ServiceRequest) (ls *List, errC *resp.Response, er
 			for _, v := range sms {
 				sr := &ServiceResponse{
 					ServiceMeta: ServiceMeta(*v),
-					Status:      true,
+					IsOnline:    true,
 					Env:         req.Env,
 				}
 				res = append(res, sr)
@@ -255,19 +256,37 @@ func (m ServiceResponseList) Less(i, j int) bool {
 		return false
 	}
 
+	// 服务类型
+
+	typA, errA := strconv.Atoi(m[i].Typ)
+	typB, errB := strconv.Atoi(m[j].Typ)
+	if errA != nil && errB != nil {
+		if m[i].Typ < m[j].Typ {
+			return true
+		}
+		if m[i].Typ > m[j].Typ {
+			return false
+		}
+	}
+	if errA != nil {
+		return true
+	}
+	if errB != nil {
+		return false
+	}
+
+	if typA < typB {
+		return true
+	}
+	if typA > typB {
+		return false
+	}
+
 	// 集群
 	if m[i].Path < m[j].Path {
 		return true
 	}
 	if m[i].Path > m[j].Path {
-		return false
-	}
-
-	// 服务类型
-	if m[i].Typ < m[j].Typ {
-		return true
-	}
-	if m[i].Typ > m[j].Typ {
 		return false
 	}
 

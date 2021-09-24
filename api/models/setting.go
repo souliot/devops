@@ -24,7 +24,6 @@ func GetTypSettingStruct(typ string) (s interface{}) {
 	case strconv.Itoa(e.AccountTypeSupport):
 	case strconv.Itoa(e.AccountTypeMonitor):
 	case strconv.Itoa(e.AccountTypeDistribution):
-		return new(sconf.AshardsSerSetting)
 	case strconv.Itoa(e.AccountTypeRtmp):
 	case strconv.Itoa(e.AccountTypeCaseVideo):
 	case strconv.Itoa(e.AccountTypeDataBackup):
@@ -47,6 +46,7 @@ func GetAppSettingStruct(typ string) (s interface{}) {
 	case strconv.Itoa(e.AccountTypeBusiness):
 		return new(sconf.BusinessServerAppSetting)
 	case strconv.Itoa(e.AccountTypeAlarm):
+		return new(sconf.AlarmAppSetting)
 	case strconv.Itoa(e.AccountTypeCom):
 	case strconv.Itoa(e.AccountTypeMaster):
 		return new(sconf.MasterNodeAppSetting)
@@ -56,11 +56,13 @@ func GetAppSettingStruct(typ string) (s interface{}) {
 	case strconv.Itoa(e.AccountTypeSupport):
 	case strconv.Itoa(e.AccountTypeMonitor):
 	case strconv.Itoa(e.AccountTypeDistribution):
+		return new(sconf.AshardsAppSetting)
 	case strconv.Itoa(e.AccountTypeRtmp):
 	case strconv.Itoa(e.AccountTypeCaseVideo):
 	case strconv.Itoa(e.AccountTypeDataBackup):
 	case strconv.Itoa(e.AccountTypeGB):
 	case strconv.Itoa(e.AccountTypeSaveMonitor):
+		return new(sconf.AshardsAppSetting)
 	case strconv.Itoa(e.AccountTypeFeatureStore):
 		return new(sconf.FeatureCollectAppSetting)
 	case strconv.Itoa(e.AccountTypeSetting):
