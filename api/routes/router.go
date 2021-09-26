@@ -26,6 +26,7 @@ func InitRouter(r *gin.Engine) {
 			user.GET("/:id", (&controllers.User{}).One)
 			user.POST("", (&controllers.User{}).Add)
 			user.PUT("", (&controllers.User{}).Update)
+			user.PUT("/password", (&controllers.User{}).UpdatePassword)
 			user.DELETE("/:id", (&controllers.User{}).Delete)
 			user.POST("/logout", (&controllers.User{}).Logout)
 			user.GET("/getUserInfo", (&controllers.User{}).GetUserInfo)

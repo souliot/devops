@@ -47,9 +47,9 @@ func InitModels() {
 func InitData() (err error) {
 	// default user
 	u := &User{
-		UserName: "llz",
+		UserName: "admin",
 		Password: "1",
-		Name:     "Souliot",
+		Name:     "系统管理员",
 	}
 	_, err = u.Add()
 	if err != nil && err.Error() != ErrUserExist.Error() {

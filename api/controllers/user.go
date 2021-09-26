@@ -108,6 +108,30 @@ func (c *User) Update(ctx *gin.Context) {
 }
 
 // @Tags 用户
+// @Summary  修改用户
+// @Description 修改用户的接口
+// @Accept  json
+// @Produce json
+// @Param object body models.User true "用户"
+// @Success 200 {object}	resp.Response{data=models.User} "返回数据 User"
+// @Router /user/password [put]
+func (c *User) UpdatePassword(ctx *gin.Context) {
+	m := new(models.User)
+	m.Roles = make([]string, 0)
+	if err := ctx.ShouldBind(m); err != nil {
+		c.CheckError(err, ctx)
+		return
+	}
+
+	errC, err := m.UpdatePassword()
+	if err != nil {
+		ctx.JSON(200, errC)
+		return
+	}
+	ctx.JSON(200, resp.NewSuccess(m))
+}
+
+// @Tags 用户
 // @Summary  删除用户
 // @Description 删除用户的接口
 // @Accept  json
