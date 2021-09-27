@@ -107,5 +107,11 @@ func InitRouter(r *gin.Engine) {
 		{
 			ctrl.PUT("", (&controllers.Controller{}).Controller)
 		}
+
+		// metricsProm
+		metricsProm := v1.Group("/metricsProm")
+		{
+			metricsProm.GET("hostinfo", (&controllers.MetricsProm{}).HostInfo)
+		}
 	}
 }

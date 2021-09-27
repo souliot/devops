@@ -10,6 +10,8 @@ require (
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/common v0.26.0
+	github.com/shopspring/decimal v1.2.0
 	github.com/souliot/siot-log v0.0.0-20210324112039-3349436275c9
 	github.com/souliot/siot-orm v0.0.0-20210827060956-635cd60054b1
 	github.com/spf13/viper v1.8.1
@@ -53,7 +55,6 @@ require (
 	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.8 // indirect

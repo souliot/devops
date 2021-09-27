@@ -1,5 +1,5 @@
 httpport: 8080
-promaddress: prom:885
+promaddress: 192.168.0.4:885
 dbtype: mongo
 dbhost:
   - 192.168.0.4:27017
