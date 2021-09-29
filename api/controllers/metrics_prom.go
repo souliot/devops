@@ -17,7 +17,7 @@ type MetricsProm struct {
 // @Accept  json
 // @Produce json
 // @Success 200 {object}	resp.Response "返回数据"
-// @Router /metricsProm [get]
+// @Router /metricsProm/hostinfo [get]
 func (c *MetricsProm) HostInfo(ctx *gin.Context) {
 	m := &models.MetricsProm{}
 	res, errC, err := m.HostInfo()

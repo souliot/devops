@@ -25,7 +25,7 @@ func InitPromApi() (err error) {
 	return
 }
 
-func getMatrix(pql string, ctx context.Context, r v1.Range) (ret []model.SamplePair, err error) {
+func getMatrix(ctx context.Context, pql string, r v1.Range) (ret []model.SamplePair, err error) {
 	ret = make([]model.SamplePair, 0)
 	res, _, err := promApi.QueryRange(ctx, pql, r)
 	if err != nil {
@@ -40,8 +40,8 @@ func getMatrix(pql string, ctx context.Context, r v1.Range) (ret []model.SampleP
 	return
 }
 
-func getVector(pql string, ctx context.Context) (ret model.Vector, err error) {
-	res, _, err := promApi.Query(ctx, pql, time.Now())
+func getVector(ctx context.Context, pql string, t time.Time) (ret model.Vector, err error) {
+	res, _, err := promApi.Query(ctx, pql, t)
 	if err != nil {
 		return
 	}
