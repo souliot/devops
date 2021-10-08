@@ -1,122 +1,72 @@
-# DevOps developed by golang
+# devops 运维平台后端
 
-## 部署方式
+主要实现运维平台后端 API 接口，包括服务管理、监控、配置中心等功能。
 
-```shell
-# 1.解压缩包 devops.tar.gz 得到以下文件
-tar -zxvf devops.tar.gz
-# .
-# ├── devops-images.tar.gz
-# ├── docker-compose.yml
-# ├── load-images.sh
-# ├── prom
-# │   ├── conf
-# │   │   └── prometheus.yml
-# │   └── data
-# └── save-images.sh
+> 监控依赖于 prometheus
 
-# 2.加载镜像文件
-./load-images.sh
+## 打包
 
-# 3.修改配置文件 docker-compose.yml
-vim docker-compose.yml
+```bash
+# 构建
+./build.sh
 
-# version: '3.7'
-
-# services:
-#   devops-ui:
-#     container_name: devops-ui
-#     hostname: devops-ui
-#     image: devops-ui:5.1.2.0
-#     ports:
-#       - 38080:80     // 运维平台访问端口 38080（外部端口:容器内端口）--容器内端口固定
-#     restart: always
-#     depends_on:
-#       - devops
-#     ulimits:
-#       nofile:
-#         soft: 262144
-#         hard: 262144
-#     networks:
-#       darwin:
-#         aliases:
-#           - devops-ui
-#     logging:
-#       driver: json-file
-#       options:
-#         max-file: '7'
-#         max-size: 100m
-
-#   devops:
-#     container_name: devops
-#     hostname: devops
-#     image: devops:5.1.2.0
-#     restart: always
-#     ulimits:
-#       nofile:
-#         soft: 262144
-#         hard: 262144
-#     environment:
-#       PROMADDRESS: prom:9090   // prometheus 地址（不用改）
-#       DBHOST: 192.168.0.4:27017  // 本身存储数据的 mongo 地址；多个用 ; 隔开
-#       DBNAME: Darwin-DevOps    //  数据库名称
-#       DBUSER: ''    // 数据库用户名
-#       DBPASSWORD: ''  // 数据库密码
-#     volumes:
-#       - ./prom/conf:/app/prom
-#     networks:
-#       darwin:
-#         aliases:
-#           - devops
-#     logging:
-#       driver: json-file
-#       options:
-#         max-file: '7'
-#         max-size: 100m
-
-#   prom:
-#     container_name: prom
-#     hostname: prom
-#     image: prom/prometheus:v2.29.2
-#     privileged: true
-#     ports:
-#       - 39090:9090   // prometheus 对外端口
-#     volumes:
-#       - ./prom/conf:/etc/prometheus
-#       - ./prom/data:/prometheus
-#       - /etc/localtime:/etc/localtime
-#     command:
-#       - '--web.enable-lifecycle'
-#       - '--config.file=/etc/prometheus/prometheus.yml'
-#       - '--storage.tsdb.path=/prometheus'
-#       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-#       - '--web.console.templates=/usr/share/prometheus/consoles'
-#     restart: always
-#     networks:
-#       darwin:
-#         aliases:
-#           - prom
-#     ulimits:
-#       nofile:
-#         soft: 262144
-#         hard: 262144
-#     logging:
-#       driver: json-file
-#       options:
-#         max-file: '7'
-#         max-size: 100m
-
-# networks:
-#   darwin:
-#     external: true
+# 打包 docker 镜像
+./docker-build.sh
 ```
 
-## 问题
+## 框架
 
-### 1、docker 网络不存在
+> 主要包括 api | pkg
 
-```shell
-# 这个是因为 这边没有直接创建网络，而是采用已有的网络"darwin",执行以下命令创建网络：
+### api
 
-docker network create darwin
-```
+config | controllers | models | routers | api.go
+
+#### config
+
+> 服务配置初始化  
+> 先加载默认配置，再读取配置文件，再读取环境变量，合并配置。
+
+#### controllers
+
+> controllers 主要包括业务逻辑处理。  
+> 每一个业务模块对应一个 controller，使用注解路由。  
+> base.go 实现路由拦截，包括一些控制器基础公用方法。
+> auth.go 实现 jwt 认证路由拦截。
+
+#### 数据模型 models
+
+> models 主要包括基础业务数据处理  
+> 每一个业务模块对应一个 model，并于 controllers 一一对应
+
+#### 路由 routers
+
+> routers/router.go 是路由文件，已于 gin 实现核心路由功能。
+
+#### 主服务 api.go
+
+> api.go 服务程序住文件，服务初始化全过程。
+
+### pkg
+
+auth | db | fileutil | resp | trans
+
+#### auth
+
+> 实现 jwt 认证加密算法。
+
+#### db
+
+> 实现数据库初始化的基础库。
+
+#### fileutil
+
+> 文件操作基础库。
+
+#### resp
+
+> 控制器返回 http json 数据的基础库。
+
+#### trans
+
+> gin 国际化基础库，base.go 里面会调用。
